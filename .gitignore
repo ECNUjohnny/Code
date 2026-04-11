@@ -53,3 +53,10 @@
 # Jupyter Notebook 缓存
 # =========================
 **/.ipynb_checkpoints/
+
+# =========================
+# Hugo 生成的网页成品与缓存 (切勿上传)
+# =========================
+public/
+resources/
+.hugo_build.lock
