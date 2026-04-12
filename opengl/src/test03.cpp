@@ -20,10 +20,11 @@ unsigned int borderVAO, borderVBO;
 char s[N];
 char *edge = "D:/Code/opengl/data/data.txt", *polygon = "D:/Code/opengl/data/data1.txt";
 float xmax = 390, xmin = -390, ymax = 390, ymin = -390, eps = 1e-9;
+int tot;
 struct vertex
 {
     float x, y;
-} v[N];
+} v[N], w[N];
 
 glm::mat4 Projection = glm::ortho(-450.0f, 450.0f, -450.0f, 450.0f);
 
@@ -123,6 +124,70 @@ inline void process_edge(char *loc)
     glBufferData(GL_ARRAY_BUFFER, n * sizeof(vertex), &v[1], GL_STATIC_DRAW);
 }
 
+inline int inside(vertex &v, int bound)
+{
+    if (bound == 1) return v.x >= xmin;
+    else if (bound == 2) return v.y <= ymax;
+    else if (bound == 3) return v.x <= xmax;
+    else return v.y >= ymin;
+}
+
+vertex intersect(vertex &a, vertex &b, int bound, float p)
+{
+    float k = fabs(a.x - b.x) < eps ? 2e15 : (a.y - b.y) / (a.x - b.x);
+    vertex ret;
+
+    if (bound & 1)
+    {
+        ret.y = k * (p - b.x) + b.y;
+        ret.x = p;
+    }
+    else
+    {
+        ret.x = (p - b.y) / k + b.x;
+        ret.y = p;
+    }
+
+    return ret;
+}
+
+void process_seg(int bound)
+{
+    tot = 0;
+    
+    for (int i = 1; i <= n; i++)
+    {
+        vertex a = v[i], b = v[i % n + 1];
+    
+        int c1 = inside(a, bound), c2 = inside(b, bound);
+
+        if (!c1 && !c2) continue;
+        else if (c1 && c2)
+        {
+            w[++tot] = b;
+        }
+        else if (!c1 && c2)
+        {
+            if (bound == 1) w[++tot] = intersect(a, b, bound, xmin);
+            else if (bound == 2) w[++tot] = intersect(a, b, bound, ymax);
+            else if (bound == 3) w[++tot] = intersect(a, b, bound, xmax);
+            else w[++tot] = intersect(a, b, bound, ymin);
+
+            w[++tot] = b;
+        }
+        else
+        {
+            if (bound == 1) w[++tot] = intersect(a, b, bound, xmin);
+            else if (bound == 2) w[++tot] = intersect(a, b, bound, ymax);
+            else if (bound == 3) w[++tot] = intersect(a, b, bound, xmax);
+            else w[++tot] = intersect(a, b, bound, ymin);
+        }
+    }
+
+    memcpy(v, w, sizeof(w));
+    n = tot;
+}
+
 inline void process_polygon(char *loc)
 {
     FILE *dat = fopen(loc, "r");
@@ -134,8 +199,19 @@ inline void process_polygon(char *loc)
     }
 
     fscanf(dat, "%d", &n);
+    tot = n;
     for (int i = 1; i <= n; i++) fscanf(dat, "%f%f", &v[i].x, &v[i].y);
     fclose(dat);
+
+    //for (int i = 1; i <= n; i++) printf("%f %f\n", v[i].x, v[i].y);
+
+    process_seg(1);
+    process_seg(2);
+    process_seg(3);
+    process_seg(4);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, n * sizeof(vertex), &v[1], GL_STATIC_DRAW);
 }
 
 void CharacterCallBack(GLFWwindow* window, unsigned int codepoint)
@@ -227,7 +303,8 @@ int main()
         glDrawArrays(GL_LINE_LOOP, 0, 4);
 
         glBindVertexArray(VAO);
-        glDrawArrays(GL_LINES, 0, n);
+        if (op == 1) glDrawArrays(GL_LINES, 0, n);
+        else if (op == 2) glDrawArrays(GL_LINE_LOOP, 0, n);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
