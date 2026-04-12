@@ -304,7 +304,7 @@ int main()
 
         glBindVertexArray(VAO);
         if (op == 1) glDrawArrays(GL_LINES, 0, n);
-        else if (op == 2) glDrawArrays(GL_LINE_LOOP, 0, n);
+        else if (op == 2) glDrawArrays(GL_TRIANGLE_FAN, 0, n);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
