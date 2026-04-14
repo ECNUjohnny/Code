@@ -4,8 +4,8 @@ import tifffile
 import cv2
 
 # 设置你的输入和输出文件夹路径
-input_folder = r"D:/File/Research/dataset/DanXia/tif"  # 替换成你的 TIFF 文件夹
-output_folder = r"D:/File/Research/dataset/DanXia/png1" # 转换后 PNG 的保存位置
+input_folder = r"D:/File/Research/dataset/Kasite/tif"  # 替换成你的 TIFF 文件夹
+output_folder = r"D:/File/Research/dataset/Kasite/png" # 转换后 PNG 的保存位置
 
 if not os.path.exists(output_folder):
     os.makedirs(output_folder)

@@ -47,7 +47,7 @@ def convert_to_asf_format(dms_str):
 # === 测试代码 ===
 if __name__ == "__main__":
     # 你输入的坐标
-    dms_coordinate = "27°39′00″N 117°57′00″E"
+    dms_coordinate = "18°40′00″S 44°45′00″E"
     
     try:
         lat, lon = convert_to_asf_format(dms_coordinate)
