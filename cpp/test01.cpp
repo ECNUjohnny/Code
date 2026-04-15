@@ -11,49 +11,42 @@
 using namespace std;
 typedef long long ll;
 
-const int N = 3005;
-double eps = 1e-9;
-int t, n, tot, d1[N], d2[N];
-struct func
-{
-    int a, b, c;
-} f[N];
+const int N = 505, M = 1e4 + 5;
+int n, m, p[M], f[M], ans = -1;
 
-vector<int> p[N], q[N];
-
-bool cmp(func a, func b)
+struct box
 {
-    if (a.a > b.a) return 0;
-    else if (a.a == b.a) return a.b == b.b && b.c > a.c;
-    else
-    {
-        int d = a.a - b.a;
-        int e = a.b - b.b;
-        int f = a.c - b.c;
-        return e * e - 4 * d * f < 0;
-    }
-}
+    int c, e;
+} b[N];
 
 int main()
 {
-    scanf("%d", &t);
-
-    while (t--)
+    scanf("%d%d", &m, &n);
+    for (int i = 1; i <= m; i++) scanf("%d", &p[i]);
+    for (int i = 1; i <= n; i++)
     {
-        scanf("%d", &n);
-        for (int i = 1; i <= n; i++) scanf("%d%d%d", &f[i].a, &f[i].b, &f[i].c);
-    
-        for (int i = 1; i <= n; i++)
+        scanf("%d%d", &b[i].c, &b[i].e);
+        if (b[i].c > m) b[i].c = m;
+    }
+
+    sort(p + 1, p + m + 1);
+    reverse(p + 1, p + m + 1);
+
+    memset(f, 0x3f, sizeof(f));
+    f[0] = 0;
+
+    for (int i = 2; i <= m; i++) p[i] += p[i - 1];
+    for (int i = 1; i <= n; i++)
+    {
+        for (int j = m; j; j--)
         {
-            for (int j = 1; j <= n; j++)
-            {
-                if (cmp(f[i], f[j]))
-                {
-                    
-                }
-            }
+            f[j] = min(f[j], f[max(0, j - b[i].c)] + b[i].e);
         }
     }
+
+    for (int i = 0; i <= m; i++) ans = max(ans, p[i] - f[i]);
+
+    printf("%d\n", ans);
 
     return 0;
 }
