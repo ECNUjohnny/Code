@@ -29,7 +29,7 @@ add_subdirectory(lib/glfw)
 # --- 定义我们的可执行文件 ---
 
 # 添加我们的主程序，它由 src/main.cpp 编译而来
-file(GLOB_RECURSE SOURCES "src/test03.cpp")
+file(GLOB_RECURSE SOURCES "src/test04.cpp")
 
 # 将收集到的所有源文件编译成可执行文件
 add_executable(${PROJECT_NAME} ${SOURCES})
