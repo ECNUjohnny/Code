@@ -60,6 +60,41 @@ public:
     bitset<64> ALUOperation(bitset<3> ALUOP, bitset<64> oprand1, bitset<64> oprand2)
     {
         // TODO: implement!
+        switch(ALUOP.to_ulong())
+        {
+            case 0:
+                ALUresult = oprand1.to_ulong() + oprand2.to_ulong();
+                break;
+            
+            case 1:
+                ALUresult = oprand1.to_ulong() - oprand2.to_ulong();
+                break;
+
+            case 2:
+                ALUresult = oprand1 & oprand2;
+                break;
+
+            case 3:
+                ALUresult = oprand1 | oprand2;
+                break;
+
+            case 4:
+                ALUresult = oprand1 ^ oprand2;
+                break;
+
+            case 5:
+                break;
+
+            case 6:
+                break;
+
+            case 7:
+                break;
+            
+            default:
+                break;
+        }
+
     }
 };
 
@@ -73,7 +108,7 @@ public:
         ifstream imem;
         string line;
         int i = 0;
-        imem.open("imem.txt");
+        imem.open("D:/Code/cpp/organization/imem.txt");
         if (imem.is_open())
         {
             while (getline(imem, line))
@@ -83,7 +118,9 @@ public:
             }
         }
         else
+        {
             cout << "Unable to open file";
+        }
         imem.close();
     }
 
@@ -91,7 +128,11 @@ public:
     {
         // TODO: implement!
         // (Read the byte at the ReadAddress and the following three byte).
-
+        
+        for (int i = 3; i >= 0; i--)
+        {
+            for (int j = i << 3; j <= (i << 3) + 7; j++) Instruction[j] = IMem[ReadAddress.to_ulong() + (3 - i)][j - (i << 3)];
+        }
         //
         return Instruction;
     }
@@ -110,7 +151,7 @@ public:
         ifstream dmem;
         string line;
         int i = 0;
-        dmem.open("dmem.txt");
+        dmem.open("D:/Code/cpp/organization/dmem.txt");
         if (dmem.is_open())
         {
             while (getline(dmem, line))
@@ -120,7 +161,10 @@ public:
             }
         }
         else
+        {
             cout << "Unable to open file";
+        }
+
         dmem.close();
     }
     bitset<64> MemoryAccess(bitset<64> Address, bitset<64> WriteData, bitset<1> readmem, bitset<1> writemem)
@@ -131,7 +175,7 @@ public:
     void OutputDataMem()
     {
         ofstream dmemout;
-        dmemout.open("dmemresult.txt");
+        dmemout.open("D:/Code/cpp/organization/dmemresult.txt");
         if (dmemout.is_open())
         {
             for (int j = 0; j < 1000; j++)
@@ -174,7 +218,7 @@ int main()
         // If current insturciton is "11111111111111111111111111111111", then break;
         if (myInsMem.Instruction.to_ulong() == 0xffffffff)
         {
-            break;
+            break; 
         }
 
         // decode(Read RF)
@@ -311,10 +355,9 @@ int main()
 
             myRF.OutputRF(); // dump RF;
         }
-        myDataMem.OutputDataMem(); // dump data mem
-
-        break;
     }
+
+    myDataMem.OutputDataMem(); // dump data mem
 
     return 0;
 }
