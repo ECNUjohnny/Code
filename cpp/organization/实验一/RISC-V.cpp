@@ -30,12 +30,22 @@ public:
     void ReadWrite(bitset<5> RdReg1, bitset<5> RdReg2, bitset<5> WrtReg, bitset<64> WrtData, bitset<1> WrtEnable) // WrtEnable 0 is read else is read and write
     {
         // TODO: implement!
+        if (WrtEnable.to_ulong())
+        {
+            Registers[WrtReg.to_ulong()] = WrtData;
+        }
+        else
+        {
+            ReadData1 = Registers[RdReg1.to_ulong()];
+
+            ReadData2 = Registers[RdReg2.to_ulong()];
+        }
     }
 
     void OutputRF()
     {
         ofstream rfout;
-        rfout.open("RFresult.txt", std::ios_base::app);
+        rfout.open("./RFresult.txt", std::ios_base::app);
         if (rfout.is_open())
         {
             rfout << "A state of RF:" << endl;
@@ -108,7 +118,7 @@ public:
         ifstream imem;
         string line;
         int i = 0;
-        imem.open("D:/Code/cpp/organization/imem.txt");
+        imem.open("./imem.txt");
         if (imem.is_open())
         {
             while (getline(imem, line))
@@ -151,7 +161,7 @@ public:
         ifstream dmem;
         string line;
         int i = 0;
-        dmem.open("D:/Code/cpp/organization/dmem.txt");
+        dmem.open("./dmem.txt");
         if (dmem.is_open())
         {
             while (getline(dmem, line))
@@ -170,6 +180,14 @@ public:
     bitset<64> MemoryAccess(bitset<64> Address, bitset<64> WriteData, bitset<1> readmem, bitset<1> writemem)
     {
         // TODO: implement!
+        if (readmem.to_ulong())
+        {
+
+        }
+        else
+        {
+
+        }
     }
 
     void OutputDataMem()
@@ -272,8 +290,7 @@ int main()
             (isJType[0]) ? bitset<5>(string("00000")) : bitset<5>(instruction.to_string().substr(12, 5)),
             (isIType[0] || isJType[0] || isLoad[0]) ? bitset<5>(string("00000")) : bitset<5>(instruction.to_string().substr(7, 5)),
             (isIType[0] || isRType[0] || isJType[0] || isLoad[0]) ? bitset<5>(instruction.to_string().substr(20, 5)) : bitset<5>(string("00000")),
-            bitset<64>(0), wrtEnable
-        );
+            bitset<64>(0), wrtEnable);
 
         // 3. Execuete alu operation
         bitset<64> tmp;
