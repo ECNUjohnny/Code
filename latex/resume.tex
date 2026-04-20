@@ -1,0 +1,107 @@
+\documentclass[a4paper]{article}
+    \usepackage{fullpage}
+    \usepackage{amsmath}
+    \usepackage{amssymb}
+    \usepackage{textcomp}
+    \usepackage[utf8]{inputenc}
+    \usepackage[T1]{fontenc}
+    \textheight=10in
+    \pagestyle{empty}
+    \raggedright
+    \usepackage[left=0.8in,right=0.8in,bottom=0.8in,top=0.8in]{geometry}
+
+    %\renewcommand{\encodingdefault}{cg}
+%\renewcommand{\rmdefault}{lgrcmr}
+
+\def\bull{\vrule height 0.8ex width .7ex depth -.1ex }
+
+% DEFINITIONS FOR RESUME %%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\area} [2] {
+    \vspace*{-9pt}
+    \begin{verse}
+        \textbf{#1}   #2
+    \end{verse}
+}
+
+\newcommand{\lineunder} {
+    \vspace*{-8pt} \\
+    \hspace*{-18pt} \hrulefill \\
+}
+
+\newcommand{\header} [1] {
+    {\hspace*{-18pt}\vspace*{6pt} \textsc{#1}}
+    \vspace*{-6pt} \lineunder
+}
+
+\newcommand{\employer} [3] {
+    { \textbf{#1} (#2)\\ \underline{\textbf{\emph{#3}}}\\  }
+}
+
+\newcommand{\contact} [3] {
+    \vspace*{-10pt}
+    \begin{center}
+        {\Huge \scshape {#1}}\\
+        #2 \\ #3
+    \end{center}
+    \vspace*{-8pt}
+}
+
+\newenvironment{achievements}{
+    \begin{list}
+        {$\bullet$}{\topsep 0pt \itemsep -2pt}}{\vspace*{4pt}
+    \end{list}
+}
+
+\newcommand{\schoolwithcourses} [4] {
+    \textbf{#1} #2 $\bullet$ #3\\
+    #4 \\
+    \vspace*{5pt}
+}
+
+\newcommand{\school} [4] {
+    \textbf{#1} #2 $\bullet$ #3\\
+    #4 \\
+}
+% END RESUME DEFINITIONS %%%%%%%%%%%%%%%%%%%%%%%
+
+    \begin{document}
+\vspace*{-40pt}
+
+    
+
+%==== Profile ====%
+\vspace*{-10pt}
+\begin{center}
+	{\Huge \scshape {Zhou Junyan}}\\
+	East China Normal University, Shang Hai, China $\cdot$ Acmejohnnylynd@gmail.com $\cdot$ (+86) 18900670760 $\cdot$ ECNUjohnny.github.io\\
+\end{center}
+
+%==== Education ====%
+\header{Beachlor Degree}
+\textbf{East China Normal University}\hfill Shang Hai, China\\
+BS Computer Science \textit{GPA: not finfished yet} \hfill First of September, 2024 - Twentieth of June, 2028\\
+\vspace{2mm}
+
+
+
+\header{Skills}
+\begin{tabular}{ l l }
+	Programing Language:                 & CPP, Python, html, Hlsl, Unity Shader Language \\
+	Expedition Tools:                    & Git, Latex, Visual Studio Code                 \\
+	Game Engine and Geographic Standard: & Opengl, Unity                                  \\
+\end{tabular}
+\vspace{2mm}
+
+\header{Projects}
+{\textbf{LLM based Fluid Rendered}} {\sl Unity, Unity Shader Language, CPP} \\
+Implement the cartoon render of a sph fluid and use LLM to map its function according to the text input from users\\
+\vspace*{2mm}
+
+\header{Awards}
+\textbf{Mathematics competition of Chinese College Students} \hfill Mathematical Society of China, Mathematical Society of Shang Hai\\
+First Prize in Shang Hai area \hfill December, 2025\\
+\vspace*{2mm}
+
+\ 
+\end{document}

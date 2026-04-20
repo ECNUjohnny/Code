@@ -30,7 +30,7 @@ def run_tool():
         iface.messageBar().pushMessage("错误", "请先选中底图", level=Qgis.Warning, duration=5)
         return
 
-    # 提取图层名并清理特殊字符，支持中文
+    
     raw_name = layer.name()
     safe_name = re.sub(r'[\\/*?:"<>|]', '', raw_name).replace(' ', '_')
 
@@ -94,7 +94,6 @@ def run_tool():
                 fname = f"{safe_name}_pt{pt_idx+1}_{i+1}_{time_str}.tif"
                 path = os.path.join(out_dir, fname)
                 
-                # 直接输出原生的 TIF 文件
                 params = {'INPUT': layer, 'PROJWIN': ext, 'EXTRA': f'-outsize {size} {size}', 'OUTPUT': path}
                 processing.run("gdal:cliprasterbyextent", params)
                 
