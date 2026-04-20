@@ -30,15 +30,14 @@ public:
     void ReadWrite(bitset<5> RdReg1, bitset<5> RdReg2, bitset<5> WrtReg, bitset<64> WrtData, bitset<1> WrtEnable) // WrtEnable 0 is read else is read and write
     {
         // TODO: implement!
+        ReadData1 = Registers[RdReg1.to_ulong()];
+
+        ReadData2 = Registers[RdReg2.to_ulong()];
+        
         if (WrtEnable.to_ulong())
         {
             Registers[WrtReg.to_ulong()] = WrtData;
-        }
-        else
-        {
-            ReadData1 = Registers[RdReg1.to_ulong()];
 
-            ReadData2 = Registers[RdReg2.to_ulong()];
         }
     }
 
@@ -73,11 +72,11 @@ public:
         switch(ALUOP.to_ulong())
         {
             case 0:
-                ALUresult = oprand1.to_ulong() + oprand2.to_ulong();
+                ALUresult = oprand1.to_ullong() + oprand2.to_ullong();
                 break;
             
             case 1:
-                ALUresult = oprand1.to_ulong() - oprand2.to_ulong();
+                ALUresult = oprand1.to_ullong() - oprand2.to_ullong();
                 break;
 
             case 2:
@@ -93,9 +92,11 @@ public:
                 break;
 
             case 5:
+                ALUresult = oprand1.to_ullong() + oprand2.to_ullong();
                 break;
 
             case 6:
+                ALUresult = oprand1.to_ullong() + oprand2.to_ullong();
                 break;
 
             case 7:
@@ -105,6 +106,8 @@ public:
                 break;
         }
 
+
+        return ALUresult;
     }
 };
 
@@ -182,18 +185,26 @@ public:
         // TODO: implement!
         if (readmem.to_ulong())
         {
-
+            for (int i = 7; i >= 0; i--)
+            {
+                for (int j = i << 3; j <= (i << 3) + 7; j++) readdata[j] = DMem[Address.to_ulong() + 7 - i][j - (i << 3)];
+            }
         }
         else
         {
-
+            for (int i = 7; i >= 0; i--)
+            {
+                for (int j = i << 3; j <= (i << 3) + 7; j++) DMem[Address.to_ulong() + 7 - i][j - (i << 3)] = WriteData[j];
+            }
         }
+
+        return readdata;
     }
 
     void OutputDataMem()
     {
         ofstream dmemout;
-        dmemout.open("D:/Code/cpp/organization/dmemresult.txt");
+        dmemout.open("./dmemresult.txt");
         if (dmemout.is_open())
         {
             for (int j = 0; j < 1000; j++)
@@ -232,6 +243,10 @@ int main()
     {
         // 1. Fetch Instruction
         bitset<32> instruction = myInsMem.ReadMemory(PC);
+
+        //cout << instruction << '\n';
+
+        cout << PC << '\n';
 
         // If current insturciton is "11111111111111111111111111111111", then break;
         if (myInsMem.Instruction.to_ulong() == 0xffffffff)
@@ -375,6 +390,8 @@ int main()
     }
 
     myDataMem.OutputDataMem(); // dump data mem
+
+    puts("1");
 
     return 0;
 }
