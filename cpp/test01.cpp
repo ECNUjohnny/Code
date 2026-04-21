@@ -13,7 +13,15 @@
 using namespace std;
 typedef long long ll;
 
+const int N = 2e5 + 5;
+int t, n, k, a[N];
+
 int main()
 {
-    
+    scanf("%d", &t);
+
+    while (t--)
+    {
+        
+    }
 }
