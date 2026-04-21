@@ -33,18 +33,17 @@ public:
         ReadData1 = Registers[RdReg1.to_ulong()];
 
         ReadData2 = Registers[RdReg2.to_ulong()];
-        
+
         if (WrtEnable.to_ulong())
         {
             Registers[WrtReg.to_ulong()] = WrtData;
-
         }
     }
 
     void OutputRF()
     {
         ofstream rfout;
-        rfout.open("./RFresult.txt", std::ios_base::app);
+        rfout.open("D:/Code/cpp/organization/Lab1/RFresult.txt", std::ios_base::app);
         if (rfout.is_open())
         {
             rfout << "A state of RF:" << endl;
@@ -52,9 +51,10 @@ public:
             {
                 rfout << Registers[j] << endl;
             }
+            puts("");
         }
         else
-            cout << "Unable to open file";
+            cout << "Unable to open file: RFresult.txt" << '\n';
         rfout.close();
     }
 
@@ -69,12 +69,12 @@ public:
     bitset<64> ALUOperation(bitset<3> ALUOP, bitset<64> oprand1, bitset<64> oprand2)
     {
         // TODO: implement!
-        switch(ALUOP.to_ulong())
+        switch (ALUOP.to_ulong())
         {
             case 0:
                 ALUresult = oprand1.to_ullong() + oprand2.to_ullong();
                 break;
-            
+
             case 1:
                 ALUresult = oprand1.to_ullong() - oprand2.to_ullong();
                 break;
@@ -100,12 +100,12 @@ public:
                 break;
 
             case 7:
+                ALUresult = oprand1.to_ullong() + oprand2.to_ullong();
                 break;
-            
+
             default:
                 break;
         }
-
 
         return ALUresult;
     }
@@ -121,7 +121,7 @@ public:
         ifstream imem;
         string line;
         int i = 0;
-        imem.open("./imem.txt");
+        imem.open("D:/Code/cpp/organization/Lab1/imem.txt");
         if (imem.is_open())
         {
             while (getline(imem, line))
@@ -132,7 +132,7 @@ public:
         }
         else
         {
-            cout << "Unable to open file";
+            cout << "Unable to open file: imem.txt" << '\n';
         }
         imem.close();
     }
@@ -141,10 +141,11 @@ public:
     {
         // TODO: implement!
         // (Read the byte at the ReadAddress and the following three byte).
-        
+
         for (int i = 3; i >= 0; i--)
         {
-            for (int j = i << 3; j <= (i << 3) + 7; j++) Instruction[j] = IMem[ReadAddress.to_ulong() + (3 - i)][j - (i << 3)];
+            for (int j = i << 3; j <= (i << 3) + 7; j++)
+                Instruction[j] = IMem[ReadAddress.to_ulong() + (3 - i)][j - (i << 3)];
         }
         //
         return Instruction;
@@ -164,18 +165,20 @@ public:
         ifstream dmem;
         string line;
         int i = 0;
-        dmem.open("./dmem.txt");
+        dmem.open("D:/Code/cpp/organization/Lab1/dmem.txt");
         if (dmem.is_open())
         {
             while (getline(dmem, line))
             {
+                //cout << line << '\n';
                 DMem[i] = bitset<8>(line.substr(0, 8));
+                //cout << DMem[i] << '\n';
                 i++;
             }
         }
         else
         {
-            cout << "Unable to open file";
+            cout << "Unable to open file: dmem.txt" << '\n';
         }
 
         dmem.close();
@@ -183,20 +186,27 @@ public:
     bitset<64> MemoryAccess(bitset<64> Address, bitset<64> WriteData, bitset<1> readmem, bitset<1> writemem)
     {
         // TODO: implement!
+        //cout << Address << '\n';
+        //cout << readmem.to_ulong() << '\n';
+
         if (readmem.to_ulong())
         {
             for (int i = 7; i >= 0; i--)
             {
-                for (int j = i << 3; j <= (i << 3) + 7; j++) readdata[j] = DMem[Address.to_ulong() + 7 - i][j - (i << 3)];
+                for (int j = (i << 3); j <= (i << 3) + 7; j++)
+                    readdata[j] = DMem[Address.to_ulong() + 7 - i][j - (i << 3)];
             }
         }
-        else
+        else if (writemem.to_ulong())
         {
             for (int i = 7; i >= 0; i--)
             {
-                for (int j = i << 3; j <= (i << 3) + 7; j++) DMem[Address.to_ulong() + 7 - i][j - (i << 3)] = WriteData[j];
+                for (int j = i << 3; j <= (i << 3) + 7; j++)
+                    DMem[Address.to_ulong() + 7 - i][j - (i << 3)] = WriteData[j];
             }
         }
+
+        //cout << readdata << '\n';
 
         return readdata;
     }
@@ -204,7 +214,7 @@ public:
     void OutputDataMem()
     {
         ofstream dmemout;
-        dmemout.open("./dmemresult.txt");
+        dmemout.open("D:/Code/cpp/organization/Lab1/dmemresult.txt");
         if (dmemout.is_open())
         {
             for (int j = 0; j < 1000; j++)
@@ -213,7 +223,7 @@ public:
             }
         }
         else
-            cout << "Unable to open file";
+            cout << "Unable to open file: demeresult.txt" << '\n';
         dmemout.close();
     }
 
@@ -244,14 +254,14 @@ int main()
         // 1. Fetch Instruction
         bitset<32> instruction = myInsMem.ReadMemory(PC);
 
-        //cout << instruction << '\n';
+        // cout << instruction << '\n';
 
-        cout << PC << '\n';
+        // cout << PC << '\n';
 
         // If current insturciton is "11111111111111111111111111111111", then break;
         if (myInsMem.Instruction.to_ulong() == 0xffffffff)
         {
-            break; 
+            break;
         }
 
         // decode(Read RF)
@@ -301,7 +311,7 @@ int main()
         }
 
         // 2. Register File Instruction
-        myRF.ReadWrite (
+        myRF.ReadWrite(
             (isJType[0]) ? bitset<5>(string("00000")) : bitset<5>(instruction.to_string().substr(12, 5)),
             (isIType[0] || isJType[0] || isLoad[0]) ? bitset<5>(string("00000")) : bitset<5>(instruction.to_string().substr(7, 5)),
             (isIType[0] || isRType[0] || isJType[0] || isLoad[0]) ? bitset<5>(instruction.to_string().substr(20, 5)) : bitset<5>(string("00000")),
@@ -313,18 +323,18 @@ int main()
         {
             // imm[11:0]
             tmp = bitset<64>(instruction.to_string().substr(0, 12)); // if positive, 0 padded
-            if (tmp[20] == true)
+            if (tmp[11] == true)
             {
-                tmp = bitset<64>(string(52, '1') + tmp.to_string().substr(20, 12));
+                tmp = bitset<64>(string(52, '1') + tmp.to_string().substr(52, 12));
             }
         }
         else if (isStore[0] == 1)
         {
             // mm[11:5] rs2 rs1 010 imm[4:0]
             tmp = bitset<64>(instruction.to_string().substr(0, 7) + instruction.to_string().substr(20, 5)); // if positive, 0 padded
-            if (tmp[20] == true)
+            if (tmp[11] == true)
             {
-                tmp = bitset<64>(string(52, '1') + tmp.to_string().substr(20, 12));
+                tmp = bitset<64>(string(52, '1') + tmp.to_string().substr(52, 12));
             }
             else if (isJType[0] == 1)
             {
@@ -337,61 +347,72 @@ int main()
             {
                 ;
             }
-
-            myALU.ALUOperation(aluOp, myRF.ReadData1, (isIType[0] || isJType[0] || isLoad[0] || isStore[0]) ? tmp : myRF.ReadData2); //
-
-            // 4. Read/Write Mem(Memory Access)
-            myDataMem.MemoryAccess(myALU.ALUresult, myRF.ReadData2, isLoad, isStore);
-
-            // 5. Register File Update(Write Back)
-            myRF.ReadWrite(
-                (isJType[0]) ? bitset<5>(string("00000")) : bitset<5>(instruction.to_string().substr(12, 5)),
-                (isJType[0] || isIType[0] || isLoad[0]) ? bitset<5>(string("00000")) : bitset<5>(instruction.to_string().substr(7, 5)),
-                (isIType[0] || isRType[0] || isJType[0] || isLoad[0]) ? bitset<5>(instruction.to_string().substr(20, 5)) : bitset<5>(string("00000")),
-                isLoad[0] ? myDataMem.readdata : myALU.ALUresult, wrtEnable);
-
-            // Update PC
-            if (isBranch[0] && myRF.ReadData1 == myRF.ReadData2)
-            {
-                bitset<32> addressExtend;
-                // if (instruction[15] == true) {
-                //     addressExtend = bitset<32>(string(14, '1') + instruction.to_string().substr(16, 16) + string("00"));
-                // }
-                // else {
-                //     addressExtend = bitset<32>(string(14, '0') + instruction.to_string().substr(16, 16) + string("00"));
-                // }
-
-                // imm[12|10:5] rs2 rs1 000 imm(20)[4:1|11]
-                if (instruction[0] == true)
-                    addressExtend = bitset<32>(string(19, '1') + instruction.to_string().substr(0, 1) + instruction.to_string().substr(24, 1) + instruction.to_string().substr(1, 6) + instruction.to_string().substr(20, 4) + string("0"));
-                else
-                    addressExtend = bitset<32>(string(19, '0') + instruction.to_string().substr(0, 1) + instruction.to_string().substr(24, 1) + instruction.to_string().substr(1, 6) + instruction.to_string().substr(20, 4) + string("0"));
-
-                // addressExtend = bitset<32>(tmp.to_string().substr(2, 30) + string("00"));
-                PC = bitset<32>(PC.to_ulong() + addressExtend.to_ulong());
-            }
-            else if (isJType[0])
-            {
-                bitset<32> addressExtend;
-                // imm[20|10:1|11|19:12]
-                if (instruction[0] == true)
-                    addressExtend = bitset<32>(string(11, '1') + instruction.to_string().substr(0, 1) + instruction.to_string().substr(12, 8) + instruction.to_string().substr(11, 1) + instruction.to_string().substr(1, 10) + string("0"));
-                else
-                    addressExtend = bitset<32>(string(11, '0') + instruction.to_string().substr(0, 1) + instruction.to_string().substr(12, 8) + instruction.to_string().substr(11, 1) + instruction.to_string().substr(1, 10) + string("0"));
-                PC = bitset<32>(PC.to_ulong() + addressExtend.to_ulong());
-            }
-            else
-            {
-                PC = bitset<32>(PC.to_ulong() + 4);
-            }
-
-            myRF.OutputRF(); // dump RF;
         }
+
+        //cout << "tmp = " << tmp << '\n';
+        //puts("");
+
+        myALU.ALUOperation(aluOp, myRF.ReadData1, (isIType[0] || isJType[0] || isLoad[0] || isStore[0]) ? tmp : myRF.ReadData2); //
+
+        //cout << isIType[0] << '\n';
+        //cout << aluOp << '\n';
+        //cout << "ReadData1 = " << myRF.ReadData1 << '\n';
+        //cout << isLoad[0] << '\n';
+
+        //cout << myALU.ALUresult << '\n';
+
+        // 4. Read/Write Mem(Memory Access)
+        myDataMem.MemoryAccess(myALU.ALUresult, myRF.ReadData2, isLoad, isStore);
+
+        cout << "readdata = " << myDataMem.readdata << '\n';
+
+        // 5. Register File Update(Write Back)
+        myRF.ReadWrite(
+            (isJType[0]) ? bitset<5>(string("00000")) : bitset<5>(instruction.to_string().substr(12, 5)),
+            (isJType[0] || isIType[0] || isLoad[0]) ? bitset<5>(string("00000")) : bitset<5>(instruction.to_string().substr(7, 5)),
+            (isIType[0] || isRType[0] || isJType[0] || isLoad[0]) ? bitset<5>(instruction.to_string().substr(20, 5)) : bitset<5>(string("00000")),
+            isLoad[0] ? myDataMem.readdata : myALU.ALUresult, wrtEnable);
+
+        // Update PC
+
+        if (isBranch[0] && myRF.ReadData1 == myRF.ReadData2)
+        {
+            bitset<32> addressExtend;
+            // if (instruction[15] == true) {
+            //     addressExtend = bitset<32>(string(14, '1') + instruction.to_string().substr(16, 16) + string("00"));
+            // }
+            // else {
+            //     addressExtend = bitset<32>(string(14, '0') + instruction.to_string().substr(16, 16) + string("00"));
+            // }
+
+            // imm[12|10:5] rs2 rs1 000 imm(20)[4:1|11]
+            if (instruction[0] == true)
+                addressExtend = bitset<32>(string(19, '1') + instruction.to_string().substr(0, 1) + instruction.to_string().substr(24, 1) + instruction.to_string().substr(1, 6) + instruction.to_string().substr(20, 4) + string("0"));
+            else
+                addressExtend = bitset<32>(string(19, '0') + instruction.to_string().substr(0, 1) + instruction.to_string().substr(24, 1) + instruction.to_string().substr(1, 6) + instruction.to_string().substr(20, 4) + string("0"));
+
+            // addressExtend = bitset<32>(tmp.to_string().substr(2, 30) + string("00"));
+            PC = bitset<32>(PC.to_ulong() + addressExtend.to_ulong());
+        }
+        else if (isJType[0])
+        {
+            bitset<32> addressExtend;
+            // imm[20|10:1|11|19:12]
+            if (instruction[0] == true)
+                addressExtend = bitset<32>(string(11, '1') + instruction.to_string().substr(0, 1) + instruction.to_string().substr(12, 8) + instruction.to_string().substr(11, 1) + instruction.to_string().substr(1, 10) + string("0"));
+            else
+                addressExtend = bitset<32>(string(11, '0') + instruction.to_string().substr(0, 1) + instruction.to_string().substr(12, 8) + instruction.to_string().substr(11, 1) + instruction.to_string().substr(1, 10) + string("0"));
+            PC = bitset<32>(PC.to_ulong() + addressExtend.to_ulong());
+        }
+        else
+        {
+            PC = bitset<32>(PC.to_ulong() + 4);
+        }
+
+        myRF.OutputRF(); // dump RF;
     }
 
     myDataMem.OutputDataMem(); // dump data mem
-
-    puts("1");
 
     return 0;
 }
