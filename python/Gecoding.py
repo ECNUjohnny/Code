@@ -31,6 +31,6 @@ def get_bbox(name, out_file):
         print(f"❌ 报错: {e}")
 
 # 运行测试
-q = "大塔穆火山"
+q = "丹霞山"
 f = "./Data/baota.json"
 get_bbox(q, f)

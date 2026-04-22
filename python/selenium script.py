@@ -38,14 +38,14 @@ def search_arxiv(q_str):
                 clean_title = t.text.replace('Title:', '').strip()
                 print(f"{i+1}. {clean_title}")
         else:
-            print("\n⚠️ 没有找到结果。")
+            print("\n没有找到结果。")
             
     except Exception as e:
         print(f"❌ 运行报错: {e}")
         
     finally:
         print("\n3秒后自动关闭浏览器...")
-        time.sleep(3)
+        time.sleep(30)
         driver.quit()
 
 if __name__ == "__main__":
