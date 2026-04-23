@@ -4,10 +4,10 @@ from rasterio.windows import Window
 import numpy as np
 
 # ================= 1. 配置参数 =================
-INPUT_DIR = "D:/File/Research/dataset/Batch_DEM_Outputs"  # 你的原始数据文件夹
-OUTPUT_DIR = "D:/File/Research/dataset/Batch_DEM_Outputs2" # 最终数据集输出文件夹
+INPUT_DIR = "D:\File\Research\dataset\Test2"  # 你的原始数据文件夹
+OUTPUT_DIR = "D:\File\Research\dataset\Test2" # 最终数据集输出文件夹
 PATCH_SIZE = 256
-STRIDE = 64  # 步长 128 代表 50% 的重叠率
+STRIDE = 128  # 步长 128 代表 50% 的重叠率
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 tif_files = [f for f in os.listdir(INPUT_DIR) if f.endswith('.tif')]

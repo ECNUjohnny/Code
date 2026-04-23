@@ -12,7 +12,7 @@ API_KEY = "b21b7d8e4a0c90d358df7360822b6e76"
 
 # 定义你要保存的特定文件夹路径 (Windows 路径建议前面加 r，或者使用双斜杠 \\)
 # 例如: r"D:\Unity_Projects\GIS_Data\DEMs"
-SAVE_FOLDER = r"D:/File/Research/Dataset/opentopography" 
+SAVE_FOLDER = r"D:/File/Research/Dataset/Opentopography" 
 
 # 确保保存的文件夹存在，如果不存在则自动创建
 os.makedirs(SAVE_FOLDER, exist_ok=True)
@@ -21,98 +21,40 @@ os.makedirs(SAVE_FOLDER, exist_ok=True)
 # 将你需要下载的多个区域写成一个列表
 # bounds 的顺序务必保持为: (south, north, west, east) 即 (南纬, 北纬, 西经, 东经)
 target_areas = [
-    # 敦煌雅丹（甘肃）
+    # ========== 亚洲 (Asia) ==========
     {
-        "name": "Dunhuang_Main",
-        "bounds": (40.450, 40.550, 92.950, 93.100)
+        "name": "Yarlung_Tsangpo_Grand_Canyon", # 雅鲁藏布大峡谷 (中国西藏) - 世界最深最长的峡谷之一
+        "bounds": (29.400, 30.100, 94.700, 95.600)
     },
     {
-        "name": "Dunhuang_North",
-        "bounds": (40.550, 40.650, 92.980, 93.150)
+        "name": "Tiger_Leaping_Gorge", # 虎跳峡 (中国云南)
+        "bounds": (27.200, 27.400, 100.050, 100.250)
     },
     {
-        "name": "Dunhuang_South",
-        "bounds": (40.350, 40.450, 92.900, 93.000)
+        "name": "Kali_Gandaki_Gorge", # 卡利甘达基峡谷 (尼泊尔) - 喜马拉雅山脉中的极深峡谷
+        "bounds": (28.500, 28.850, 83.550, 83.850)
     },
-
-    # 柴达木盆地雅丹群（青海）
+    
+    # ========== 非洲 (Africa) - 东非大裂谷带 ==========
     {
-        "name": "Qaidam_Wusute_Water_Yardang", # 水上雅丹
-        "bounds": (37.780, 37.850, 92.200, 92.300)
-    },
-    {
-        "name": "Qaidam_Nanbaxian", # 南八仙
-        "bounds": (38.150, 38.250, 93.350, 93.450)
+        "name": "Great_Rift_Valley_Ethiopia", # 东非大裂谷 (埃塞俄比亚段)
+        "bounds": (7.000, 10.000, 38.500, 40.500)
     },
     {
-        "name": "Qaidam_Eboliang", # 俄博梁
-        "bounds": (38.550, 38.650, 92.250, 92.350)
+        "name": "Great_Rift_Valley_Kenya", # 东非大裂谷 (肯尼亚格雷戈里裂谷段)
+        "bounds": (-2.500, 1.500, 35.500, 36.500)
     },
     {
-        "name": "Qaidam_Mangya", # 茫崖周边
-        "bounds": (38.300, 38.400, 91.500, 91.650)
+        "name": "Great_Rift_Valley_Albertine", # 东非大裂谷 (西线阿尔伯特裂谷，坦噶尼喀湖周边)
+        "bounds": (-8.000, -3.000, 29.000, 31.000)
     },
     {
-        "name": "Qaidam_Lenghu", # 冷湖周边
-        "bounds": (38.700, 38.800, 92.800, 92.950)
-    },
-
-    # 哈密魔鬼城（新疆）
-    {
-        "name": "Hami_Wubao", # 五堡
-        "bounds": (42.680, 42.780, 92.750, 92.900)
+        "name": "Fish_River_Canyon", # 鱼河大峡谷 (纳米比亚) - 非洲最大峡谷
+        "bounds": (-28.000, -27.500, 17.500, 17.850)
     },
     {
-        "name": "Hami_Sandaoling", # 三道岭
-        "bounds": (42.850, 42.950, 92.500, 92.650)
-    },
-    {
-        "name": "Hami_Shiqiang", # 十八里房/石城子附近
-        "bounds": (42.500, 42.600, 93.000, 93.150)
-    },
-
-    # 乌尔禾魔鬼城（新疆克拉玛依）
-    {
-        "name": "Wuerhe_Main",
-        "bounds": (46.080, 46.150, 85.280, 85.350)
-    },
-    {
-        "name": "Wuerhe_East",
-        "bounds": (46.100, 46.180, 85.350, 85.450)
-    },
-    {
-        "name": "Wuerhe_South",
-        "bounds": (46.000, 46.080, 85.200, 85.300)
-    },
-
-    # 罗布泊雅丹群（新疆）
-    {
-        "name": "LopNur_Bailongdui", # 白龙堆
-        "bounds": (40.400, 40.500, 90.500, 90.700)
-    },
-    {
-        "name": "LopNur_Sanlongsha", # 三垄沙
-        "bounds": (40.100, 40.250, 90.800, 90.950)
-    },
-    {
-        "name": "LopNur_Longcheng", # 龙城
-        "bounds": (40.600, 40.750, 90.200, 90.350)
-    },
-
-    # 吐鲁番及周边雅丹（新疆）
-    {
-        "name": "Turpan_Toksun", # 托克逊盘吉尔
-        "bounds": (42.650, 42.750, 88.500, 88.650)
-    },
-    {
-        "name": "Turpan_Shanshan", # 鄯善周边
-        "bounds": (42.700, 42.800, 89.900, 90.050)
-    },
-
-    # 库车雅丹（新疆）
-    {
-        "name": "Kuche_Yardang", # 库车周边
-        "bounds": (41.650, 41.750, 83.050, 83.150)
+        "name": "Blyde_River_Canyon", # 布莱德河峡谷 (南非)
+        "bounds": (-24.650, -24.500, 30.750, 30.900)
     }
 ]
 

@@ -15,7 +15,7 @@ print("正在通过 NASA API 检索数据...")
 results = earthaccess.search_data(
     short_name="NASADEM_HGT",
     bounding_box=bbox,
-    count=4  # 最大返回数量（防止你不小心框了整个地球导致崩溃）
+    count=10  # 最大返回数量（防止你不小心框了整个地球导致崩溃）
 )
 
 print(f"找到了 {len(results)} 个匹配的数据瓦片！")
