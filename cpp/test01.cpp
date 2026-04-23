@@ -13,44 +13,19 @@
 using namespace std;
 typedef long long ll;
 
-const int N = 2e5 + 5;
-int t, n, ans, fa[N], d[N];
-vector<int> g[N];
+int t, a[66], tot;
+ll s, m, ans, u;
 
-void dfs(int a, int c)
+ll num(ll u)
 {
-    fa[a] = c;
+    ll ret = 0;
 
-    for (int b: g[a])
+    for (int i = 0; i <= 63; i++)
     {
-        if (b == c) continue;
-        dfs(b, a);
+        if ((u >> i) & 1) ret += (ll)1 << a[i]; 
     }
-}
 
-void bfs()
-{
-    queue<int> q;
-
-    q.push(1);
-    d[1] = 0;
-
-    while (q.size())
-    {
-        int dep = d[q.front()], sum = 0, flag = 0;
-
-        while (d[q.front()] == dep)
-        {
-            int a = q.front();
-            flag++;
-            q.pop();
-
-            for (int b: g[a])
-            {
-
-            }
-        }
-    }
+    return ret;
 }
 
 int main()
@@ -59,19 +34,50 @@ int main()
     
     while (t--)
     {
-        scanf("%d", &n);
-        for (int i = 1; i <= n; i++) g[i].clear(), fa[i] = i, d[i] = -1;
+        scanf("%lld%lld", &s, &m);
         ans = 0;
-
-        for (int i = 1; i < n; i++)
+        
+        if ((s & 1) && !(m & 1))
         {
-            int a, b;
-            scanf("%d%d", &a, &b);
-            g[a].push_back(b);
-            g[b].push_back(a);
+            puts("-1");
+            continue;
         }
 
+        memset(a, 0, sizeof(a));
+        tot = -1;
+        
+        for (int i = 0; i <= 63; i++) if ((m >> i) & 1) a[++tot] = i;
+        for (int i = 0; i <= tot; i++) u += 1 << i;
 
+        //for (int i = 0; i <= tot; i++) printf("%d ", a[i]);
+        //puts("");
+
+        int flag = 0;
+        while (s)
+        {
+            ll l = 0, r = u;
+
+            while (l < r)
+            {
+                ll mid = l + r + 1 >> 1;
+                ll c = num(mid);
+                if (c <= s) l = mid;
+                else r = mid - 1;
+            }
+
+            if (!l)
+            {
+                flag = 1;
+                break;
+            }
+
+            printf("%d\n", num(l));
+            ans += s / num(l);
+            s %= num(l);
+        }
+
+        if (flag) puts("-1");
+        else printf("%d\n", ans);
     }
 
     return 0;
