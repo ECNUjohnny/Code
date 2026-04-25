@@ -4,7 +4,7 @@ import tifffile
 import cv2
 
 # 设置你的输入和输出文件夹路径
-input_folder = "D:\File\Research\dataset\DEM from CDSE"  # 替换成你的 TIFF 文件夹
+input_folder = "D:\File\Research\dataset\Test2"  # 替换成你的 TIFF 文件夹
 output_folder = "D:\File\Research\dataset\Test3" # 转换后 PNG 的保存位置
 
 if not os.path.exists(output_folder):
@@ -18,7 +18,7 @@ for file_name in tif_files:
     output_path = os.path.join(output_folder, file_name.replace('.tif', '.png'))
     
     # 【新增】打印当前正在处理的文件名，这样报错时你就知道是哪个文件的问题了
-    print(f"正在处理: {file_name} ...")
+    #print(f"正在处理: {file_name} ...")
     
     try:
         # 1. 读取高精度 TIFF 数据
