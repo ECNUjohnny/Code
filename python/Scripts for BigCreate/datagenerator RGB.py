@@ -4,27 +4,27 @@ from rasterio.windows import Window
 import numpy as np
 
 # ================= 1. 配置参数 =================
-INPUT_DIR = "D:\File\Research\dataset\DEM from CDSE"  # 你的原始数据文件夹
-OUTPUT_DIR = "D:\File\Research\dataset\Test2" # 最终数据集输出文件夹
-PATCH_SIZE = 256
-STRIDE = 64 # 步长 128 代表 50% 的重叠率
+# ⚠️ 注意修改这里的输入和输出路径，避免覆盖你的高度图数据
+INPUT_DIR = "D:\File\Research\dataset\RGB from CDSE"  
+OUTPUT_DIR = "D:\File\Research\dataset\Test3_RGB" 
+PATCH_SIZE = 512
+STRIDE = 256 # 步长 64
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 tif_files = [f for f in os.listdir(INPUT_DIR) if f.endswith('.tif')]
 
 # ================= 2. 核心辅助函数 =================
-def save_patch(data_2d, meta, out_path):
+def save_patch(data_3d, meta, out_path):
     """
-    保存 2D 高程矩阵为 TIF 文件。
-    rasterio 需要写入 3D 形状 (bands, height, width)，所以这里自动在第 0 维增加一个维度。
+    保存多通道矩阵为 TIF 文件。
+    因为 data_3d 已经是 (bands, height, width) 的形状，直接写入即可，无需 expand_dims。
     """
-    data_3d = np.expand_dims(data_2d, axis=0)
     with rasterio.open(out_path, "w", **meta) as dest:
         dest.write(data_3d)
 
 total_generated = 0
 
-print(f"找到 {len(tif_files)} 张原始数据，开始执行深度切片与全方位增强...\n")
+print(f"找到 {len(tif_files)} 张 RGB 卫星图，开始执行深度切片与全方位增强...\n")
 
 # ================= 3. 执行流水线 =================
 for filename in tif_files:
@@ -46,10 +46,8 @@ for filename in tif_files:
             for x in x_offsets:
                 # 1. 切取原始基础窗口
                 window = Window(col_off=x, row_off=y, width=PATCH_SIZE, height=PATCH_SIZE)
-                patch_data_3d = src.read(window=window)
-                
-                # 提取二维高度矩阵用于矩阵变换
-                img_2d = patch_data_3d[0] 
+                # 读取出来的形状是 (bands, height, width)，对于 RGB 是 (3, 256, 256)
+                patch_data_3d = src.read(window=window) 
                 
                 # 复制并更新元数据
                 patch_meta = src.meta.copy()
@@ -60,36 +58,38 @@ for filename in tif_files:
                 })
                 
                 # ---------- 开始数据增强 ----------
+                # 注意：rasterio 的数据排列是 (通道数, Y轴/高度, X轴/宽度)
+                # 因此 axis=1 是上下翻转，axis=2 是左右翻转
                 
                 # A. 基础原图 (Base)
-                save_patch(img_2d, patch_meta, os.path.join(OUTPUT_DIR, f"{base_name}_y{y}_x{x}_base.tif"))
+                save_patch(patch_data_3d, patch_meta, os.path.join(OUTPUT_DIR, f"{base_name}_y{y}_x{x}_base.tif"))
                 total_generated += 1
-                
-                # B. 水平翻转 (Left-Right Flip)
-                flip_lr = np.fliplr(img_2d)
+                """
+                # B. 水平翻转 (Left-Right Flip) - 指定翻转 X 轴 (axis=2)
+                flip_lr = np.flip(patch_data_3d, axis=2)
                 save_patch(flip_lr, patch_meta, os.path.join(OUTPUT_DIR, f"{base_name}_y{y}_x{x}_flr.tif"))
                 total_generated += 1
                 
-                # C. 垂直翻转 (Up-Down Flip / 上下翻转)
-                flip_ud = np.flipud(img_2d)
+                # C. 垂直翻转 (Up-Down Flip / 上下翻转) - 指定翻转 Y 轴 (axis=1)
+                flip_ud = np.flip(patch_data_3d, axis=1)
                 save_patch(flip_ud, patch_meta, os.path.join(OUTPUT_DIR, f"{base_name}_y{y}_x{x}_fud.tif"))
                 total_generated += 1
                 
-                """
-                # D. 逆时针旋转 90 度 (k=1)
-                rot_90 = np.rot90(img_2d, k=1)
+                
+                # D. 逆时针旋转 90 度 (在最后两个维度即空间维度上旋转)
+                rot_90 = np.rot90(patch_data_3d, k=1, axes=(1, 2))
                 save_patch(rot_90, patch_meta, os.path.join(OUTPUT_DIR, f"{base_name}_y{y}_x{x}_r90.tif"))
                 total_generated += 1
                 
-                # E. 逆时针旋转 180 度 (k=2)
-                rot_180 = np.rot90(img_2d, k=2)
+                # E. 逆时针旋转 180 度
+                rot_180 = np.rot90(patch_data_3d, k=2, axes=(1, 2))
                 save_patch(rot_180, patch_meta, os.path.join(OUTPUT_DIR, f"{base_name}_y{y}_x{x}_r180.tif"))
                 total_generated += 1
                 
-                # F. 逆时针旋转 270 度 (k=3)
-                rot_270 = np.rot90(img_2d, k=3)
+                # F. 逆时针旋转 270 度
+                rot_270 = np.rot90(patch_data_3d, k=3, axes=(1, 2))
                 save_patch(rot_270, patch_meta, os.path.join(OUTPUT_DIR, f"{base_name}_y{y}_x{x}_r270.tif"))
                 total_generated += 1
                 """
 
-print(f"🎉 处理完成！通过步长滑动与物理增强，成功裂变出 {total_generated} 个 {PATCH_SIZE}x{PATCH_SIZE} 训练样本！")
+print(f"🎉 RGB 处理完成！共成功裂变出 {total_generated} 个 {PATCH_SIZE}x{PATCH_SIZE} 卫星图训练样本！")
