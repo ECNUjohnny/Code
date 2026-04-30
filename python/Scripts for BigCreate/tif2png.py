@@ -18,7 +18,7 @@ for file_name in tif_files:
     output_path = os.path.join(output_folder, file_name.replace('.tif', '.png'))
     
     # 【新增】打印当前正在处理的文件名，这样报错时你就知道是哪个文件的问题了
-    print(f"正在处理: {file_name} ...")
+    #print(f"正在处理: {file_name} ...")
     
     try:
         # 1. 读取高精度 TIFF 数据
