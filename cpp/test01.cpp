@@ -11,18 +11,8 @@
 #include <cmath>
 
 using namespace std;
-typedef long long ll;
-
-int t, n, m, k;
 
 int main()
 {
-    scanf("%d", &t);
     
-    while (t--)
-    {
-        
-    }
-
-    return 0;
 }
