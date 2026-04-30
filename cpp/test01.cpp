@@ -13,7 +13,13 @@
 using namespace std;
 typedef long long ll;
 
+int t;
+
 int main()
 {
+    scanf("%d", &t);
     
+    puts("1");
+
+    return 0;
 }
