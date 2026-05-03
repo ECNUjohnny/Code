@@ -1,6 +1,10 @@
 # CMake 最低版本要求
 cmake_minimum_required(VERSION 3.15)
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+
 # 项目名称
 project(test)
 
@@ -25,6 +29,7 @@ add_subdirectory(lib/glfw)
 # 你的源文件现在都在 src/ 目录下，直接指定路径即可
 # 如果你想编译其他测试文件，只需把这里的 test04.cpp 改成 test01.cpp 即可
 set(SOURCES "src/test04.cpp")
+
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 

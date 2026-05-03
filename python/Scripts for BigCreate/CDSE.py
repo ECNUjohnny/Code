@@ -3,17 +3,16 @@ import requests
 import time
 import math
 from dotenv import load_dotenv
+from urllib3.exceptions import ProtocolError 
 
 # ================= 1. 环境与路径配置 =================
 load_dotenv()
 CLIENT_ID = os.getenv("CDSE_CLIENT_ID")
 CLIENT_SECRET = os.getenv("CDSE_CLIENT_SECRET")
 
-#print(os.getenv("CDSE_CLIENT_ID"))
-
 # 设置并创建两个独立的输出文件夹
-RGB_DIR = "D:\File\Research\dataset\RGB from CDSE"
-DEM_DIR = "D:\File\Research\dataset\DEM from CDSE"
+RGB_DIR = "D:/WorkSpace/Research/dataset/DEM from CDSE"
+DEM_DIR = "D:/WorkSpace/Research/dataset/RGB from CDSE"
 os.makedirs(RGB_DIR, exist_ok=True)
 os.makedirs(DEM_DIR, exist_ok=True)
 
@@ -22,237 +21,244 @@ TOKEN_URL = "https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/
 PROCESS_URL = "https://sh.dataspace.copernicus.eu/api/v1/process"
 
 # ================= 2. 定义批量下载的区域数组 =================
-# 格式: "bounds": (南纬, 北纬, 西经, 东经)
+# 包含 50 个高山和复杂地形的列表
 input_regions = [
-    # ========== 世界著名高山与峰顶 ==========
+    # ========== 亚洲 (Asia) ==========
     {
-        "name": "Mount_Everest_Peak", # 珠穆朗玛峰 - 核心主峰区 (亚洲)
-        "bounds": (27.850, 28.050, 86.750, 86.950)
+        "name": "Mount_Everest_Himalayas",
+        "bounds": (27.888, 28.088, 86.825, 87.025)
     },
     {
-        "name": "Mount_Kilimanjaro", # 乞力马扎罗山 - 火山口 (非洲)
-        "bounds": (-3.160, -2.960, 37.250, 37.450)
+        "name": "K2_Karakoram",
+        "bounds": (35.781, 35.981, 76.413, 76.613)
     },
     {
-        "name": "Mount_Fuji", # 富士山 - 顶部区域 (亚洲)
-        "bounds": (35.260, 35.460, 138.630, 138.830)
+        "name": "Annapurna_Massif",
+        "bounds": (28.496, 28.696, 83.720, 83.920)
     },
     {
-        "name": "Mont_Blanc", # 勃朗峰 - 阿尔卑斯山脉 (欧洲)
-        "bounds": (45.730, 45.930, 6.760, 6.960)
+        "name": "Mount_Kinabalu",
+        "bounds": (5.975, 6.175, 116.458, 116.658)
     },
     {
-        "name": "Mount_Denali", # 迪纳利山 - 北美最高峰 (北美洲)
-        "bounds": (62.970, 63.170, -151.100, -150.900)
+        "name": "Mount_Damavand",
+        "bounds": (35.851, 36.051, 52.012, 52.212)
     },
     {
-        "name": "Aconcagua", # 阿空加瓜山 - 安第斯山脉 (南美洲)
-        "bounds": (-32.750, -32.550, -70.110, -69.910)
+        "name": "Mount_Ararat",
+        "bounds": (39.602, 39.802, 44.199, 44.399)
     },
     {
-        "name": "Mount_Elbrus", # 厄尔布鲁士山 - 高加索山脉 (欧洲)
-        "bounds": (43.250, 43.450, 42.340, 42.540)
-    },
-
-    # ========== 极端干旱与沙漠区 ==========
-    {
-        "name": "Sahara_Desert_Dunes", # 撒哈拉沙漠 - 沙丘群 (非洲)
-        "bounds": (23.000, 23.200, 11.000, 11.200)
+        "name": "Mount_Siguniang",
+        "bounds": (31.006, 31.206, 102.802, 103.002)
     },
     {
-        "name": "Atacama_Desert", # 阿塔卡马沙漠 - 极旱区 (南美洲)
-        "bounds": (-24.100, -23.900, -69.600, -69.400)
+        "name": "Namcha_Barwa",
+        "bounds": (29.529, 29.729, 94.954, 95.154)
     },
     {
-        "name": "Namib_Desert_Namibia", # 纳米布沙漠 - 红色沙丘 (非洲)
-        "bounds": (-24.800, -24.600, 15.300, 15.500)
+        "name": "Tomur_Peak",
+        "bounds": (41.938, 42.138, 80.029, 80.229)
     },
     {
-        "name": "Taklamakan_Desert", # 塔克拉玛干沙漠 - 流动沙丘 (亚洲)
-        "bounds": (39.000, 39.200, 80.000, 80.200)
+        "name": "Tirich_Mir",
+        "bounds": (36.154, 36.354, 71.741, 71.941)
     },
     {
-        "name": "Death_Valley", # 死谷 - 北美最低点 (北美洲)
-        "bounds": (36.150, 36.350, -116.900, -116.700)
+        "name": "Bogda_Peak",
+        "bounds": (43.697, 43.897, 88.433, 88.633)
     },
     {
-        "name": "Rub_al_Khali", # 鲁卜哈利沙漠 - 阿拉伯半岛 (亚洲)
-        "bounds": (20.000, 20.200, 50.000, 50.200)
+        "name": "Nanga_Parbat",
+        "bounds": (35.137, 35.337, 74.489, 74.689)
     },
     {
-        "name": "Simpson_Desert", # 辛普森沙漠 - 红色中心 (大洋洲)
-        "bounds": (-24.600, -24.400, 137.400, 137.600)
-    },
-
-    # ========== 茂密森林与热带雨林 ==========
-    {
-        "name": "Amazon_Rainforest_Core", # 亚马逊雨林 - 核心区 (南美洲)
-        "bounds": (-3.100, -2.900, -60.100, -59.900)
+        "name": "Minya_Konka",
+        "bounds": (29.495, 29.695, 101.778, 101.978)
     },
     {
-        "name": "Congo_Basin", # 刚果盆地热带雨林 (非洲)
-        "bounds": (1.000, 1.200, 23.000, 23.200)
+        "name": "Mount_Apo",
+        "bounds": (6.887, 7.087, 125.171, 125.371)
     },
     {
-        "name": "Daintree_Rainforest", # 戴恩树雨林 (大洋洲)
-        "bounds": (-16.300, -16.100, 145.300, 145.500)
-    },
-    {
-        "name": "Taiga_Siberia", # 西伯利亚泰加林 - 针叶林 (亚洲)
-        "bounds": (62.000, 62.200, 110.000, 110.200)
-    },
-    {
-        "name": "Black_Forest", # 黑森林 - 温带森林 (欧洲)
-        "bounds": (48.250, 48.450, 8.050, 8.250)
-    },
-    {
-        "name": "Sequoia_National_Park", # 红杉树国家公园 (北美洲)
-        "bounds": (36.450, 36.650, -118.850, -118.650)
-    },
-    {
-        "name": "Borneo_Rainforest", # 婆罗洲热带雨林 (亚洲)
-        "bounds": (2.400, 2.600, 114.000, 114.200)
+        "name": "Belukha_Mountain",
+        "bounds": (49.706, 49.906, 86.488, 86.688)
     },
 
-    # ========== 独特高程地貌与火山 (替换了之前的城市) ==========
+    # ========== 欧洲 (Europe) ==========
     {
-        "name": "Meteor_Crater", # 巴林杰陨石坑 - 极度规整的巨大凹陷 (北美洲)
-        "bounds": (34.930, 35.130, -111.120, -110.920)
+        "name": "Matterhorn",
+        "bounds": (45.876, 46.076, 7.558, 7.758)
     },
     {
-        "name": "Mount_St_Helens", # 圣海伦斯火山 - 马蹄形火山口 (北美洲)
-        "bounds": (46.100, 46.300, -122.290, -122.090)
+        "name": "Mont_Blanc_Massif",
+        "bounds": (45.732, 45.932, 6.765, 6.965)
     },
     {
-        "name": "Mount_Vesuvius", # 维苏威火山 - 复杂的双层火山口 (欧洲)
-        "bounds": (40.720, 40.920, 14.330, 14.530)
+        "name": "Grossglockner",
+        "bounds": (46.974, 47.174, 12.593, 12.793)
     },
     {
-        "name": "Mount_Roraima", # 罗赖马山 - 边缘极其陡峭的平顶桌状山 (南美洲)
-        "bounds": (5.090, 5.290, -60.830, -60.630)
+        "name": "Pico_de_Aneto",
+        "bounds": (42.532, 42.732, 0.557, 0.757)
     },
     {
-        "name": "Sognefjord_Norway", # 松恩峡湾 - 极深的海蚀峡湾与高耸悬崖 (欧洲)
-        "bounds": (60.830, 61.030, 6.900, 7.100)
+        "name": "Mount_Elbrus",
+        "bounds": (43.249, 43.449, 42.338, 42.538)
     },
     {
-        "name": "Milford_Sound", # 米尔福德峡湾 - 高落差冰川地貌 (大洋洲)
-        "bounds": (-44.740, -44.540, 167.790, 167.990)
+        "name": "Mount_Triglav",
+        "bounds": (46.278, 46.478, 13.740, 13.940)
     },
     {
-        "name": "Guilin_Karst", # 桂林阳朔 - 密集的喀斯特峰林 (亚洲)
-        "bounds": (24.680, 24.880, 110.400, 110.600)
+        "name": "Galdhopiggen",
+        "bounds": (61.536, 61.736, 8.212, 8.412)
     },
     {
-        "name": "Blyde_River_Canyon", # 布莱德河峡谷 - 巨大的绿色峡谷切割 (非洲)
-        "bounds": (-24.680, -24.480, 30.710, 30.910)
-    },
-
-    # ========== 峡谷、地貌与奇观 ==========
-    {
-        "name": "Grand_Canyon", # 科罗拉多大峡谷 (北美洲)
-        "bounds": (36.000, 36.200, -112.250, -112.050)
+        "name": "Kebnekaise",
+        "bounds": (67.802, 68.002, 18.416, 18.616)
     },
     {
-        "name": "Yarlung_Tsangpo_Canyon", # 雅鲁藏布大峡谷 (亚洲)
-        "bounds": (29.450, 29.650, 94.900, 95.100)
+        "name": "Gran_Paradiso",
+        "bounds": (45.419, 45.619, 7.166, 7.366)
     },
     {
-        "name": "Uluru_Ayers_Rock", # 乌鲁鲁巨岩 (大洋洲)
-        "bounds": (-25.450, -25.250, 130.950, 131.150)
-    },
-    {
-        "name": "Salar_de_Uyuni", # 乌尤尼盐沼 (南美洲)
-        "bounds": (-20.300, -20.100, -67.700, -67.500)
-    },
-    {
-        "name": "Yellowstone_Caldera", # 黄石国家公园火山口地貌 (北美洲)
-        "bounds": (44.350, 44.550, -110.650, -110.450)
-    },
-    {
-        "name": "Danxia_Landform_Zhangye", # 张掖丹霞地貌 (亚洲)
-        "bounds": (38.850, 39.050, 99.950, 100.150)
-    },
-    {
-        "name": "Richat_Structure", # 撒哈拉之眼 (非洲)
-        "bounds": (21.020, 21.220, -11.500, -11.300)
+        "name": "Gerlachovsky_Stit",
+        "bounds": (49.064, 49.264, 20.033, 20.233)
     },
 
-    # ========== 河口三角洲与广阔湿地 ==========
+    # ========== 北美洲 (North America) ==========
     {
-        "name": "Nile_Delta", # 尼罗河三角洲农田水网 (非洲)
-        "bounds": (31.350, 31.550, 30.950, 31.150)
+        "name": "Denali_Massif",
+        "bounds": (62.969, 63.169, -151.107, -150.907)
     },
     {
-        "name": "Mississippi_Delta", # 密西西比河三角洲 (北美洲)
-        "bounds": (29.150, 29.350, -89.350, -89.150)
+        "name": "Mount_Rainier",
+        "bounds": (46.752, 46.952, -121.860, -121.660)
     },
     {
-        "name": "Ganges_Brahmaputra_Delta", # 恒河-布拉马普特拉河三角洲 (亚洲)
-        "bounds": (21.850, 22.050, 89.450, 89.650)
+        "name": "Mount_Whitney",
+        "bounds": (36.478, 36.678, -118.392, -118.192)
     },
     {
-        "name": "Mekong_Delta", # 湄公河三角洲 (亚洲)
-        "bounds": (9.850, 10.050, 105.850, 106.050)
+        "name": "Mount_Logan",
+        "bounds": (60.467, 60.667, -140.505, -140.305)
     },
     {
-        "name": "Okavango_Delta", # 奥卡万戈内陆三角洲 (非洲)
-        "bounds": (-19.550, -19.350, 22.750, 22.950)
+        "name": "Pico_de_Orizaba",
+        "bounds": (18.930, 19.130, -97.369, -97.169)
     },
     {
-        "name": "Everglades_Wetland", # 大沼泽地国家公园 (北美洲)
-        "bounds": (25.650, 25.850, -80.750, -80.550)
+        "name": "Grand_Teton",
+        "bounds": (43.641, 43.841, -110.902, -110.702)
     },
     {
-        "name": "Yellow_River_Delta", # 黄河三角洲入海口 (亚洲)
-        "bounds": (37.650, 37.850, 119.050, 119.250)
+        "name": "Mount_Robson",
+        "bounds": (53.010, 53.210, -119.256, -119.056)
+    },
+    {
+        "name": "Yosemite_Half_Dome",
+        "bounds": (37.646, 37.846, -119.633, -119.433)
+    },
+    {
+        "name": "Mount_Shasta",
+        "bounds": (41.309, 41.509, -122.294, -122.094)
+    },
+    {
+        "name": "Popocatepetl",
+        "bounds": (18.922, 19.122, -98.727, -98.527)
     },
 
-    # ========== 冰川与极地风貌 ==========
+    # ========== 南美洲 (South America) ==========
     {
-        "name": "Jakobshavn_Glacier", # 雅各布港冰川 (北美洲/格陵兰)
-        "bounds": (69.050, 69.250, -49.650, -49.450)
+        "name": "Aconcagua",
+        "bounds": (-32.753, -32.553, -70.110, -69.910)
     },
     {
-        "name": "Vatnajokull_Glacier", # 瓦特纳冰川 (欧洲/冰岛)
-        "bounds": (64.250, 64.450, -16.850, -16.650)
+        "name": "Huascaran",
+        "bounds": (-9.214, -9.014, -77.705, -77.505)
     },
     {
-        "name": "Perito_Moreno_Glacier", # 莫雷诺冰川 (南美洲)
-        "bounds": (-50.550, -50.350, -73.150, -72.950)
+        "name": "Fitz_Roy",
+        "bounds": (-49.371, -49.171, -73.143, -72.943)
     },
     {
-        "name": "Lambert_Glacier", # 兰伯特冰川 - 世界最大冰川之一 (南极洲)
-        "bounds": (-71.600, -71.400, 67.900, 68.100)
+        "name": "Chimborazo",
+        "bounds": (-1.569, -1.369, -78.916, -78.716)
     },
     {
-        "name": "Svalbard_Archipelago", # 斯瓦尔巴群岛极地带 (欧洲)
-        "bounds": (78.150, 78.350, 15.450, 15.650)
+        "name": "Cotopaxi",
+        "bounds": (-0.780, -0.580, -78.537, -78.337)
     },
     {
-        "name": "Aletsch_Glacier", # 阿莱奇冰川 (欧洲)
-        "bounds": (46.350, 46.550, 7.950, 8.150)
+        "name": "Mount_Roraima",
+        "bounds": (5.115, 5.315, -60.833, -60.633)
     },
     {
-        "name": "McMurdo_Dry_Valleys", # 麦克默多干燥谷 (南极洲)
-        "bounds": (-77.600, -77.400, 161.900, 162.100)
+        "name": "Illimani",
+        "bounds": (-16.735, -16.535, -67.884, -67.684)
+    },
+    {
+        "name": "Torres_del_Paine_Cuernos",
+        "bounds": (-51.083, -50.883, -73.066, -72.866)
+    },
+
+    # ========== 非洲 (Africa) ==========
+    {
+        "name": "Mount_Kilimanjaro_Kibo",
+        "bounds": (-3.167, -2.967, 37.255, 37.455)
+    },
+    {
+        "name": "Mount_Kenya_Batian",
+        "bounds": (-0.250, -0.050, 37.208, 37.408)
+    },
+    {
+        "name": "Rwenzori_Mount_Stanley",
+        "bounds": (0.286, 0.486, 29.772, 29.972)
+    },
+    {
+        "name": "Mount_Toubkal",
+        "bounds": (30.963, 31.163, -8.015, -7.815)
+    },
+
+    # ========== 大洋洲与南极洲 (Oceania & Antarctica) ==========
+    {
+        "name": "Aoraki_Mount_Cook",
+        "bounds": (-43.695, -43.495, 170.041, 170.241)
+    },
+    {
+        "name": "Puncak_Jaya",
+        "bounds": (-4.183, -3.983, 137.083, 137.283)
+    },
+    {
+        "name": "Mount_Vinson",
+        "bounds": (-78.625, -78.425, -85.717, -85.517)
     }
 ]
 
 # ================= 3. 定义云端微代码 (Evalscripts) =================
-# RGB 光学卫星代码 (要求返回 16位 无损数据)
+# 💡 改进版 RGB 光学卫星代码：使用 Gamma 矫正应对冰雪高反照率
 EVALSCRIPT_RGB = """
 //VERSION=3
 function setup() {
     return {
         input: ["B04", "B03", "B02", "dataMask"],
-        // 删除了 sampleType: "UINT16"，让系统默认使用 AUTO (即普通的 8位 0-255 颜色)
         output: { bands: 3 } 
     };
 }
+
 function evaluatePixel(sample) {
-    // 核心魔法：直接在云端将亮度放大 2.5 倍 (这是卫星图最常用的视觉增强系数)
-    return [sample.B04 * 2.5, sample.B03 * 2.5, sample.B02 * 2.5];
+    // 设置 Gamma 值 (大于 1.0 可以提亮暗部，同时平滑压制高亮部分)
+    // 1.5 到 2.0 之间适合冰川/雪山等高反照率地貌
+    let gamma = 1.6; 
+    let gain = 1.2; // 整体亮度微调系数
+    
+    // 应用 Gamma 矫正公式: Out = Gain * (In ^ (1/Gamma))
+    let r = gain * Math.pow(sample.B04, 1/gamma);
+    let g = gain * Math.pow(sample.B03, 1/gamma);
+    let b = gain * Math.pow(sample.B02, 1/gamma);
+    
+    return [r, g, b];
 }
 """
 
@@ -272,8 +278,7 @@ function evaluatePixel(sample) {
 
 # ================= 4. 核心下载函数 =================
 def fetch_token():
-    """获取 API 访问令牌"""
-    print("正在向 CDSE 请求访问令牌...")
+    """获取 API 访问令牌 (使用安全的 client_credentials 模式)"""
     resp = requests.post(TOKEN_URL, data={
         "grant_type": "client_credentials",
         "client_id": CLIENT_ID,
@@ -283,33 +288,19 @@ def fetch_token():
     return resp.json()["access_token"]
 
 def calculate_unified_size(bbox):
-    """
-    统一计算区域的最佳像素尺寸：
-    以30米为基准，确保 RGB 和 DEM 共享完全相同的尺寸，避免对齐错位。
-    """
+    """统一计算区域的最佳像素尺寸：以30米为基准，寻找最接近的 2 的指数"""
     west, south, east, north = bbox
-    
-    # 计算纬度跨度对应的实际物理距离 (1度纬度约等于 111000 米)
     delta_lat = north - south
     distance_meters = delta_lat * 111000
-    
-    # 以 10 米分辨率为基准算出真实应该有的像素
     true_pixels = distance_meters / 30.0
-    
-    # 寻找最接近的 2 的指数 (去掉加 1 逻辑，回归纯粹的正方形，如 512, 1024, 2048)
     power = round(math.log2(true_pixels))
-    
-    # 限制在合理范围内：最小 256，最大 2048
     power = max(8, min(11, power))
     target_size = 2 ** power
-    
     return target_size
 
-def download_data(name, bbox, token, data_type, target_size):
-    """下载引擎：接收外部传入的统一尺寸，不再内部自行决定"""
-    headers = {"Authorization": f"Bearer {token}", "Accept": "image/tiff"}
+def download_data(name, bbox, current_token, data_type, target_size):
+    """下载引擎：带有 Token 自动刷新和网络重试机制"""
     
-    # 构建 Payload，直接使用传入的 target_size
     payload = {
         "input": {
             "bounds": {
@@ -343,38 +334,55 @@ def download_data(name, bbox, token, data_type, target_size):
 
     if os.path.exists(out_path):
         print(f"  -> {data_type} 已存在，跳过。")
-        return
+        return current_token 
 
-    resp = requests.post(PROCESS_URL, headers=headers, json=payload)
-    if resp.status_code == 200:
-        with open(out_path, "wb") as f:
-            f.write(resp.content)
-        print(f"  -> 成功下载 {data_type}: {out_path}")
-    else:
-        print(f"  -> 下载 {data_type} 失败: 状态码 {resp.status_code}")
-        print(resp.text)
+    max_retries = 3
+    
+    for attempt in range(max_retries):
+        headers = {"Authorization": f"Bearer {current_token}", "Accept": "image/tiff"}
+        
+        try:
+            resp = requests.post(PROCESS_URL, headers=headers, json=payload, timeout=(15, 120))
+            
+            if resp.status_code == 401:
+                print(f"  ⚠️ Token 已过期 (401)，正在向服务器申请新 Token...")
+                current_token = fetch_token()
+                continue 
+            
+            resp.raise_for_status()
+            
+            with open(out_path, "wb") as f:
+                f.write(resp.content)
+            print(f"  -> 成功下载 {data_type}: {out_path}")
+            
+            break 
+            
+        except (requests.exceptions.RequestException, ProtocolError) as e:
+            print(f"  ❌ {data_type} 网络请求中断 (尝试 {attempt + 1}/{max_retries}): {e}")
+            if attempt < max_retries - 1:
+                time.sleep(5) 
+            else:
+                print(f"  -> 达到最大重试次数，{data_type} 下载失败。")
+
+    return current_token
 
 # ================= 5. 执行主循环 =================
 if __name__ == "__main__":
-    token = fetch_token()
-    print(f"\n成功获取 Token！准备批量处理 {len(input_regions)} 个地貌区域...\n")
+    global_token = fetch_token()
+    print(f"\n✅ 成功获取初始 Token！准备批量处理 {len(input_regions)} 个地貌区域...\n")
     
     for idx, region in enumerate(input_regions, 1):
         name = region["name"]
         south, north, west, east = region["bounds"]
         
-        # 组装 CDSE 要求的 bbox 顺序
         bbox_cdse = [west, south, east, north]
-        
-        # 💡 核心改动：在主循环里计算一次统一的尺寸
         unified_size = calculate_unified_size(bbox_cdse)
         
         print(f"\n[{idx}/{len(input_regions)}] 正在处理: {name}")
         print(f"  -> 已计算统一网格分辨率: {unified_size} x {unified_size}")
         
-        # 将统一的尺寸同时传给 DEM 和 RGB 下载函数
-        download_data(name, bbox_cdse, token, "DEM", unified_size)
-        download_data(name, bbox_cdse, token, "RGB", unified_size)
+        global_token = download_data(name, bbox_cdse, global_token, "DEM", unified_size)
+        global_token = download_data(name, bbox_cdse, global_token, "RGB", unified_size)
         
         time.sleep(1)
         

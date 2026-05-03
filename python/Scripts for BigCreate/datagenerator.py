@@ -4,8 +4,8 @@ from rasterio.windows import Window
 import numpy as np
 
 # ================= 1. 配置参数 =================
-INPUT_DIR = "D:\File\Research\dataset\DEM from CDSE"  # 你的原始数据文件夹
-OUTPUT_DIR = "D:\File\Research\dataset\Test2" # 最终数据集输出文件夹
+INPUT_DIR = "D:/WorkSpace/Research/dataset/RGB from CDSE"  # 你的原始数据文件夹
+OUTPUT_DIR = "D:/WorkSpace/Research/dataset/Test2" # 最终数据集输出文件夹
 PATCH_SIZE = 512
 STRIDE = 256 # 步长 128 代表 50% 的重叠率
 
