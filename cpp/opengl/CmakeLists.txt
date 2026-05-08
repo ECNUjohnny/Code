@@ -15,7 +15,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # --- 1. 添加第三方库 ---
 
 # 添加 GLAD
-include_directories(lib/glad/include)
 add_library(glad STATIC lib/glad/src/glad.c)
 
 # 添加 GLFW (关闭不必要的构建选项以加快编译速度)
@@ -34,6 +33,8 @@ set(SOURCES "src/test04.cpp")
 add_executable(${PROJECT_NAME} ${SOURCES})
 
 # --- 3. 包含头文件与链接库 ---
+
+target_include_directories(glad PUBLIC lib/glad/include)
 
 # 为主程序指定头文件目录
 target_include_directories(${PROJECT_NAME} PUBLIC

@@ -13,9 +13,20 @@
 using namespace std;
 typedef long long ll;
 
-
+int t, n, m, k;
 
 int main()
 {
-    
+    scanf("%d", &t);
+
+    while (t--)
+    {
+        scanf("%d%d%d", &n, &m, &k);
+        
+        if (k - 1 < n - k) k = n - k + 1;
+
+        
+    }
+
+    return 0;
 }
