@@ -40,7 +40,7 @@ int main()
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
     //puts("1");
 
-    FILE *file = fopen("D:/Code/cpp/opengl/data/data.txt", "r");
+    FILE *file = fopen("D:/WorkSpace/Code/cpp/opengl/data/data.txt", "r");
     fscanf(file, "%f%f%f%f", &st.x, &st.y, &en.x, &en.y);
     fclose(file);
     //puts("1");
@@ -71,14 +71,14 @@ int main()
     fragShader = new char[N];
     //puts("1");
 
-    file = fopen("D:/Code/cpp/opengl/src/vert.glsl", "r");
+    file = fopen("D:/WorkSpace/Code/cpp/opengl/src/vert.glsl", "r");
     while (~(ch = fgetc(file))) vertShader[m++] = ch;
     vertShader[m] = 0;
     fclose(file);
     puts(vertShader);
 
     m = 0;
-    file = fopen("D:/Code/cpp/opengl/src/frag.glsl", "r");
+    file = fopen("D:/WorkSpace/Code/cpp/opengl/src/frag.glsl", "r");
     while (~(ch = fgetc(file))) fragShader[m++] = ch;
     fragShader[m] = 0;
     fclose(file);

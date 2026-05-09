@@ -15,6 +15,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # --- 1. 添加第三方库 ---
 
 # 添加 GLAD
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 add_library(glad STATIC lib/glad/src/glad.c)
 
 # 添加 GLFW (关闭不必要的构建选项以加快编译速度)
@@ -38,7 +42,6 @@ target_include_directories(glad PUBLIC lib/glad/include)
 
 # 为主程序指定头文件目录
 target_include_directories(${PROJECT_NAME} PUBLIC
-    lib/glad/include
     lib/glm
     src  # <-- 建议加上这一行！因为你的 Shader.h 在 src 目录下
 )

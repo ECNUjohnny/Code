@@ -13,7 +13,9 @@
 using namespace std;
 typedef long long ll;
 
-int t, n, m, k;
+const int N = 2e5 + 5;
+int t, n;
+ll h, k, a[N], b[N];
 
 int main()
 {
@@ -21,12 +23,32 @@ int main()
 
     while (t--)
     {
-        scanf("%d%d%d", &n, &m, &k);
+        scanf("%d%lld%lld", &n, &h, &k);
         
-        if (k - 1 < n - k) k = n - k + 1;
+        ll sum = 0, ans = 0;
+        
+        for (int i = 1; i <= n; i++)
+        {
+            scanf("%lld", &a[i]);
+            sum += a[i];
+            b[i] = a[i] + b[i - 1];
+        }
 
-        
+        ans += (n + k) * (h / sum);
+        h %= sum;
+
+        int i;
+        for (i = 1; i <= n; i++)
+        {
+            if (b[i] <= h && h < b[i + 1]) break;
+        }
+
+        int min_i = min_element(a + 1, a + i + 1) - a;
+        int max_i = max_element(a + i, a + n + 1) - a;
+
+        if (a[max_i] > a[min_i])
+        {
+            
+        }
     }
-
-    return 0;
 }
