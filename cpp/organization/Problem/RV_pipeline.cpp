@@ -376,18 +376,23 @@ int main()
                 string func7  = instr_str.substr(0, 7);
 
                 bool is_R      = (opcode == "0110011");
-                bool is_I      = (opcode == "0010011"); // addi
-                bool is_load   = (opcode == "0000011"); // ld
-                bool is_store  = (opcode == "0100011"); // sd
-                bool is_branch = (opcode == "1100011"); // beq
+                bool is_I      = (opcode == "0010011"); 
+                bool is_load   = (opcode == "0000011"); 
+                bool is_store  = (opcode == "0100011"); 
+                bool is_branch = (opcode == "1100011"); 
 
                 bitset<5> rs1(instr_str.substr(12, 5));
                 bitset<5> rs2(instr_str.substr(7, 5));
                 bitset<5> rd(instr_str.substr(20, 5));
 
-                
-                newState.EX.Read_data1 = myRF.readRF(rs1);
-                newState.EX.Read_data2 = myRF.readRF(rs2);
+                if (rs1 == state.EX.Wrt_reg_addr) newState.EX.Read_data1 = state.MEM.ALUresult;
+                else newState.EX.Read_data1 = myRF.readRF(rs1);
+
+                if (rs2 == state.EX.Wrt_reg_addr) newState.EX.Read_data2 = state.MEM.ALUresult;
+                else newState.EX.Read_data2 = myRF.readRF(rs2);
+
+                // newState.EX.Read_data1 = myRF.readRF(rs1);
+                // newState.EX.Read_data2 = myRF.readRF(rs2);
 
                 string imm_12;
                 if (is_load || is_I) {
@@ -447,7 +452,7 @@ int main()
                 newState.ID.Instr = instruction;
                 newState.IF.PC = state.IF.PC; 
             } else {
-                newState.IF.nop = false;
+                newState.IF.nop = false; 
                 
                 
                 if (branch_taken) {
