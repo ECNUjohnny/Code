@@ -13,9 +13,24 @@
 using namespace std;
 typedef long long ll;
 
-const int N = 2e5 + 5;
-int t, n;
-ll h, k, a[N], b[N];
+const int N = 1e5 + 5;
+int t, n, a[N], b[N];
+
+int check()
+{
+    int vis = 1;
+
+    for (int i = 2; i <= n; i++) vis += b[i];
+
+    for (int i = 1; i <= n; i++)
+    {
+        if (a[i] != vis) return 0;
+        vis -= 1;
+        vis += !b[i];
+    }
+
+    return 1;
+}
 
 int main()
 {
@@ -23,32 +38,88 @@ int main()
 
     while (t--)
     {
-        scanf("%d%lld%lld", &n, &h, &k);
-        
-        ll sum = 0, ans = 0;
-        
-        for (int i = 1; i <= n; i++)
+        scanf("%d", &n);
+        for (int i = 1; i <= n; i++) scanf("%d", &a[i]);
+    
+        int flg = 1;
+
+        for (int i = 2; i <= n; i++)
         {
-            scanf("%lld", &a[i]);
-            sum += a[i];
-            b[i] = a[i] + b[i - 1];
+            if (abs(a[i] - a[i - 1]) > 1)
+            {
+                flg = 0;
+                break;
+            }
         }
 
-        ans += (n + k) * (h / sum);
-        h %= sum;
-
-        int i;
-        for (i = 1; i <= n; i++)
+        if (!flg)
         {
-            if (b[i] <= h && h < b[i + 1]) break;
+            printf("%d\n", 0);
+            continue;
         }
 
-        int min_i = min_element(a + 1, a + i + 1) - a;
-        int max_i = max_element(a + i, a + n + 1) - a;
+        int ans = 0;
 
-        if (a[max_i] > a[min_i])
+        b[1] = 0;
+
+        flg = 1;
+
+        for (int i = 2; i <= n; i++)
         {
-            
+            if (a[i] == a[i - 1]) b[i] = !b[i - 1];
+            else if (a[i] > a[i - 1])
+            {
+                if (b[i - 1])
+                {
+                    flg = 0;
+                    break;
+                }
+                else b[i] = 0;
+            }
+            else if (a[i] < a[i - 1])
+            {
+                if (!b[i - 1])
+                {
+                    flg = 0;
+                    break;
+                }
+                else b[i] = 1;
+            }
         }
+
+        if (flg) ans += check();
+
+        flg = 1;
+
+        b[1] = 1;
+
+        for (int i = 2; i <= n; i++)
+        {
+            if (a[i] == a[i - 1]) b[i] = !b[i - 1];
+            else if (a[i] > a[i - 1])
+            {
+                if (b[i - 1])
+                {
+                    flg = 0;
+                    break;
+                }
+                else b[i] = 0;
+            }
+            else if (a[i] < a[i - 1])
+            {
+                if (!b[i - 1])
+                {
+                    flg = 0;
+                    break;
+                }
+                else b[i] = 1;
+            }
+        }
+
+        if (flg) ans += check();
+
+        printf("%d\n", ans);
     }
+
+    return 0;
 }
