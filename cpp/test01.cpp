@@ -1,124 +1,78 @@
 #include <iostream>
-#include <algorithm>
 #include <cstring>
-#include <queue>
+#include <vector>
+#include <algorithm>
 #include <unordered_map>
 #include <unordered_set>
-#include <map>
-#include <set>
-#include <vector>
-#include <bitset>
 #include <cmath>
+#include <set>
+#include <map>
+#include <queue>
 
 using namespace std;
 typedef long long ll;
 
-const int N = 1e5 + 5;
-int t, n, a[N], b[N];
+const int N = 2e5 + 5;
+int t, n;
+ll a[N];
 
-int check()
+void solve()
 {
-    int vis = 1;
+    scanf("%d", &n);
+    for (int i = 1; i <= n; i++) scanf("%lld", &a[i]);
 
-    for (int i = 2; i <= n; i++) vis += b[i];
+    map<ll, int> mp;
+    ll ans = 0, line = 0;
 
-    for (int i = 1; i <= n; i++)
+    for (int i = 1; i <= n; i++) mp[a[i]]++;
+
+    for (auto it = mp.begin(); it != mp.end(); )
     {
-        if (a[i] != vis) return 0;
-        vis -= 1;
-        vis += !b[i];
+        if (it -> second == 1)
+        {
+            it++;
+            continue;
+        }
+
+        else if (it -> second & 1)
+        {
+            ans += it -> first * (it -> second - 1);
+            line += it -> second - 1;
+            it -> second = 1;
+            it++;
+        }
+
+        else
+        {
+            ans += it -> first * (it -> second);
+            line += it -> second;
+            it = mp.erase(it);
+        }
     }
 
-    return 1;
+    auto it = mp.lower_bound(ans);
+
+    if (line == 2 && it == mp.begin()) puts("0");
+ 
+    else if (it == mp.begin()) printf("%lld\n", ans);
+
+    else if (it == next(mp.begin())) printf("%lld\n", ans + (*(--it)).first);
+
+    else
+    {
+        ans += (*(--it)).first;
+        ans += (*(--it)).first;
+        printf("%lld\n", ans);
+    }
 }
 
-int main()
+int main() 
 {
     scanf("%d", &t);
 
     while (t--)
     {
-        scanf("%d", &n);
-        for (int i = 1; i <= n; i++) scanf("%d", &a[i]);
-    
-        int flg = 1;
-
-        for (int i = 2; i <= n; i++)
-        {
-            if (abs(a[i] - a[i - 1]) > 1)
-            {
-                flg = 0;
-                break;
-            }
-        }
-
-        if (!flg)
-        {
-            printf("%d\n", 0);
-            continue;
-        }
-
-        int ans = 0;
-
-        b[1] = 0;
-
-        flg = 1;
-
-        for (int i = 2; i <= n; i++)
-        {
-            if (a[i] == a[i - 1]) b[i] = !b[i - 1];
-            else if (a[i] > a[i - 1])
-            {
-                if (b[i - 1])
-                {
-                    flg = 0;
-                    break;
-                }
-                else b[i] = 0;
-            }
-            else if (a[i] < a[i - 1])
-            {
-                if (!b[i - 1])
-                {
-                    flg = 0;
-                    break;
-                }
-                else b[i] = 1;
-            }
-        }
-
-        if (flg) ans += check();
-
-        flg = 1;
-
-        b[1] = 1;
-
-        for (int i = 2; i <= n; i++)
-        {
-            if (a[i] == a[i - 1]) b[i] = !b[i - 1];
-            else if (a[i] > a[i - 1])
-            {
-                if (b[i - 1])
-                {
-                    flg = 0;
-                    break;
-                }
-                else b[i] = 0;
-            }
-            else if (a[i] < a[i - 1])
-            {
-                if (!b[i - 1])
-                {
-                    flg = 0;
-                    break;
-                }
-                else b[i] = 1;
-            }
-        }
-
-        if (flg) ans += check();
-
-        printf("%d\n", ans);
+        solve();
     }
 
     return 0;
