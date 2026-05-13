@@ -11,68 +11,62 @@
 
 using namespace std;
 typedef long long ll;
+typedef unsigned long long ull;
 
 const int N = 2e5 + 5;
-int t, n;
-ll a[N];
+int t, n, q, a[N], b[N];
+ull h1[N], h2[N], p[N], h[N];
+
+ull get(int l, int r, ull h[])
+{
+    return h[r] - h[l - 1] * p[r - l + 1];
+}
 
 void solve()
 {
-    scanf("%d", &n);
-    for (int i = 1; i <= n; i++) scanf("%lld", &a[i]);
+    scanf("%d%d", &n, &q);
 
-    map<ll, int> mp;
-    ll ans = 0, line = 0;
+    for (int i = 1; i <= n; i++) scanf("%d", &a[i]), b[i] = b[i - 1] + a[i];
 
-    for (int i = 1; i <= n; i++) mp[a[i]]++;
-
-    for (auto it = mp.begin(); it != mp.end(); )
+    for (int i = 1; i <= q; i++)
     {
-        if (it -> second == 1)
+        int l, r;
+        scanf("%d%d", &l, &r);
+
+        if ((r - l + 1) % 3 || (b[r] - b[l - 1]) % 3)
         {
-            it++;
+            puts("-1");
             continue;
         }
 
-        else if (it -> second & 1)
+        if (get(l, r, h) == get(1, r - l + 1, h1) || get(l, r, h) == get(1, r - l + 1, h2))
         {
-            ans += it -> first * (it -> second - 1);
-            line += it -> second - 1;
-            it -> second = 1;
-            it++;
+            int num_1 = b[r] - b[l - 1];
+            int num_0 = r - l + 1 - num_1;
+            printf("%d\n", 2 * min(num_1, num_0) / 3 + max(num_1, num_0) / 3);
         }
-
         else
         {
-            ans += it -> first * (it -> second);
-            line += it -> second;
-            it = mp.erase(it);
+            printf("%d\n", (r - l + 1) / 3);
         }
-    }
-
-    auto it = mp.lower_bound(ans);
-
-    if (line == 2 && it == mp.begin()) puts("0");
- 
-    else if (it == mp.begin()) printf("%lld\n", ans);
-
-    else if (it == next(mp.begin())) printf("%lld\n", ans + (*(--it)).first);
-
-    else
-    {
-        ans += (*(--it)).first;
-        ans += (*(--it)).first;
-        printf("%lld\n", ans);
     }
 }
 
 int main() 
 {
     scanf("%d", &t);
+    
+    p[0] = 1;
+    for (int i = 1; i < N; i++)
+    {
+        p[i] = p[i - 1] * 131;
+        h1[i] = h1[i - 1] * 131 + (i & 1);
+        h2[i] = h2[i - 1] * 131 + !(i & 1);
+    }
 
     while (t--)
     {
-        solve();
+        solve();   
     }
 
     return 0;
