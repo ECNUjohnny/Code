@@ -8,9 +8,9 @@ import time
 
 # ================= 1. 路径配置 =================
 # 你刚才用滑动窗口切出来的小尺寸 DEM 文件夹
-DEM_DIR = "./ML_Dataset_Augmented_Full" 
+DEM_DIR = "D:\WorkSpace\Data\heightmaps" 
 # 用于存放对应卫星图的新文件夹
-RGB_DIR = "./ML_Dataset_RGB_Paired"      
+RGB_DIR = "D:\WorkSpace\Data\heightmaps_rgb"      
 os.makedirs(RGB_DIR, exist_ok=True)
 
 # ArcGIS 免费无认证高清卫星图接口

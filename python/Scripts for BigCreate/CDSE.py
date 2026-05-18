@@ -11,8 +11,8 @@ CLIENT_ID = os.getenv("CDSE_CLIENT_ID")
 CLIENT_SECRET = os.getenv("CDSE_CLIENT_SECRET")
 
 # 设置并创建两个独立的输出文件夹
-RGB_DIR = "D:/WorkSpace/Research/dataset/DEM from CDSE"
-DEM_DIR = "D:/WorkSpace/Research/dataset/RGB from CDSE"
+RGB_DIR = "D:/WorkSpace/Research/dataset/RGB from CDSE"
+DEM_DIR = "D:/WorkSpace/Research/dataset/DEM from CDSE"
 os.makedirs(RGB_DIR, exist_ok=True)
 os.makedirs(DEM_DIR, exist_ok=True)
 
@@ -23,216 +23,109 @@ PROCESS_URL = "https://sh.dataspace.copernicus.eu/api/v1/process"
 # ================= 2. 定义批量下载的区域数组 =================
 # 包含 50 个高山和复杂地形的列表
 input_regions = [
-    # ========== 亚洲 (Asia) ==========
+    # ================= 联合国教科文组织“中国丹霞”世界自然遗产 =================
     {
-        "name": "Mount_Everest_Himalayas",
-        "bounds": (27.888, 28.088, 86.825, 87.025)
+        "name": "Danxia_Mountain_Guangdong",
+        "bounds": (24.885, 25.165, 113.570, 113.880)
     },
     {
-        "name": "K2_Karakoram",
-        "bounds": (35.781, 35.981, 76.413, 76.613)
+        "name": "Wuyi_Mountain_Fujian",
+        "bounds": (27.510, 27.790, 117.795, 118.105)
     },
     {
-        "name": "Annapurna_Massif",
-        "bounds": (28.496, 28.696, 83.720, 83.920)
+        "name": "Longhu_Mountain_Jiangxi",
+        "bounds": (27.940, 28.220, 116.815, 117.125)
     },
     {
-        "name": "Mount_Kinabalu",
-        "bounds": (5.975, 6.175, 116.458, 116.658)
+        "name": "Langshan_Mountain_Hunan",
+        "bounds": (26.210, 26.490, 110.695, 111.005)
     },
     {
-        "name": "Mount_Damavand",
-        "bounds": (35.851, 36.051, 52.012, 52.212)
+        "name": "Chishui_Danxia_Guizhou",
+        "bounds": (28.310, 28.590, 105.845, 106.155)
     },
     {
-        "name": "Mount_Ararat",
-        "bounds": (39.602, 39.802, 44.199, 44.399)
+        "name": "Taining_Danxia_Fujian",
+        "bounds": (26.730, 27.010, 116.945, 117.255)
     },
     {
-        "name": "Mount_Siguniang",
-        "bounds": (31.006, 31.206, 102.802, 103.002)
-    },
-    {
-        "name": "Namcha_Barwa",
-        "bounds": (29.529, 29.729, 94.954, 95.154)
-    },
-    {
-        "name": "Tomur_Peak",
-        "bounds": (41.938, 42.138, 80.029, 80.229)
-    },
-    {
-        "name": "Tirich_Mir",
-        "bounds": (36.154, 36.354, 71.741, 71.941)
-    },
-    {
-        "name": "Bogda_Peak",
-        "bounds": (43.697, 43.897, 88.433, 88.633)
-    },
-    {
-        "name": "Nanga_Parbat",
-        "bounds": (35.137, 35.337, 74.489, 74.689)
-    },
-    {
-        "name": "Minya_Konka",
-        "bounds": (29.495, 29.695, 101.778, 101.978)
-    },
-    {
-        "name": "Mount_Apo",
-        "bounds": (6.887, 7.087, 125.171, 125.371)
-    },
-    {
-        "name": "Belukha_Mountain",
-        "bounds": (49.706, 49.906, 86.488, 86.688)
+        "name": "Jianglang_Mountain_Zhejiang",
+        "bounds": (28.390, 28.670, 118.405, 118.715)
     },
 
-    # ========== 欧洲 (Europe) ==========
+    # ================= 中国西北干旱/高原型 著名丹霞 =================
     {
-        "name": "Matterhorn",
-        "bounds": (45.876, 46.076, 7.558, 7.758)
+        # 纬度升高，经度补偿跨度增加至 0.34°
+        "name": "Zhangye_Danxia_Gansu",
+        "bounds": (38.810, 39.090, 99.980, 100.320)
     },
     {
-        "name": "Mont_Blanc_Massif",
-        "bounds": (45.732, 45.932, 6.765, 6.965)
+        "name": "Binggou_Danxia_Gansu",
+        "bounds": (38.790, 39.070, 99.700, 100.040)
     },
     {
-        "name": "Grossglockner",
-        "bounds": (46.974, 47.174, 12.593, 12.793)
+        # 纬度最高，经度补偿跨度增加至 0.37°
+        "name": "Kuqa_Grand_Canyon_Xinjiang",
+        "bounds": (42.030, 42.310, 82.960, 83.330)
     },
     {
-        "name": "Pico_de_Aneto",
-        "bounds": (42.532, 42.732, 0.557, 0.757)
+        "name": "Kanbula_Danxia_Qinghai",
+        "bounds": (35.980, 36.260, 101.130, 101.470)
     },
     {
-        "name": "Mount_Elbrus",
-        "bounds": (43.249, 43.449, 42.338, 42.538)
-    },
-    {
-        "name": "Mount_Triglav",
-        "bounds": (46.278, 46.478, 13.740, 13.940)
-    },
-    {
-        "name": "Galdhopiggen",
-        "bounds": (61.536, 61.736, 8.212, 8.412)
-    },
-    {
-        "name": "Kebnekaise",
-        "bounds": (67.802, 68.002, 18.416, 18.616)
-    },
-    {
-        "name": "Gran_Paradiso",
-        "bounds": (45.419, 45.619, 7.166, 7.366)
-    },
-    {
-        "name": "Gerlachovsky_Stit",
-        "bounds": (49.064, 49.264, 20.033, 20.233)
+        "name": "Jingbian_Wave_Valley_Shaanxi",
+        "bounds": (37.420, 37.700, 108.590, 108.930)
     },
 
-    # ========== 北美洲 (North America) ==========
+    # ================= 其他具有独特地貌特征的中国丹霞区域 =================
     {
-        "name": "Denali_Massif",
-        "bounds": (62.969, 63.169, -151.107, -150.907)
+        "name": "Gaoyiling_Chenzhou_Hunan",
+        "bounds": (25.770, 26.050, 112.965, 113.275)
     },
     {
-        "name": "Mount_Rainier",
-        "bounds": (46.752, 46.952, -121.860, -121.660)
+        "name": "Jianmen_Pass_Sichuan",
+        "bounds": (32.080, 32.360, 105.390, 105.730)
     },
     {
-        "name": "Mount_Whitney",
-        "bounds": (36.478, 36.678, -118.392, -118.192)
-    },
-    {
-        "name": "Mount_Logan",
-        "bounds": (60.467, 60.667, -140.505, -140.305)
-    },
-    {
-        "name": "Pico_de_Orizaba",
-        "bounds": (18.930, 19.130, -97.369, -97.169)
-    },
-    {
-        "name": "Grand_Teton",
-        "bounds": (43.641, 43.841, -110.902, -110.702)
-    },
-    {
-        "name": "Mount_Robson",
-        "bounds": (53.010, 53.210, -119.256, -119.056)
-    },
-    {
-        "name": "Yosemite_Half_Dome",
-        "bounds": (37.646, 37.846, -119.633, -119.433)
-    },
-    {
-        "name": "Mount_Shasta",
-        "bounds": (41.309, 41.509, -122.294, -122.094)
-    },
-    {
-        "name": "Popocatepetl",
-        "bounds": (18.922, 19.122, -98.727, -98.527)
+        "name": "Qiyun_Mountain_Anhui",
+        "bounds": (29.670, 29.950, 117.865, 118.175)
     },
 
-    # ========== 南美洲 (South America) ==========
+    # ================= 北美洲：红岩峡谷与孤峰巨怪 =================
     {
-        "name": "Aconcagua",
-        "bounds": (-32.753, -32.553, -70.110, -69.910)
+        "name": "Zion_National_Park_USA",
+        "bounds": (37.130, 37.410, -113.140, -112.800)
     },
     {
-        "name": "Huascaran",
-        "bounds": (-9.214, -9.014, -77.705, -77.505)
+        "name": "Monument_Valley_USA",
+        "bounds": (36.850, 37.130, -110.260, -109.920)
     },
     {
-        "name": "Fitz_Roy",
-        "bounds": (-49.371, -49.171, -73.143, -72.943)
-    },
-    {
-        "name": "Chimborazo",
-        "bounds": (-1.569, -1.369, -78.916, -78.716)
-    },
-    {
-        "name": "Cotopaxi",
-        "bounds": (-0.780, -0.580, -78.537, -78.337)
-    },
-    {
-        "name": "Mount_Roraima",
-        "bounds": (5.115, 5.315, -60.833, -60.633)
-    },
-    {
-        "name": "Illimani",
-        "bounds": (-16.735, -16.535, -67.884, -67.684)
-    },
-    {
-        "name": "Torres_del_Paine_Cuernos",
-        "bounds": (-51.083, -50.883, -73.066, -72.866)
+        "name": "Sedona_Red_Rocks_USA",
+        "bounds": (34.730, 35.010, -111.940, -111.600)
     },
 
-    # ========== 非洲 (Africa) ==========
+    # ================= 南美洲：干旱区巨型红壁 =================
     {
-        "name": "Mount_Kilimanjaro_Kibo",
-        "bounds": (-3.167, -2.967, 37.255, 37.455)
-    },
-    {
-        "name": "Mount_Kenya_Batian",
-        "bounds": (-0.250, -0.050, 37.208, 37.408)
-    },
-    {
-        "name": "Rwenzori_Mount_Stanley",
-        "bounds": (0.286, 0.486, 29.772, 29.972)
-    },
-    {
-        "name": "Mount_Toubkal",
-        "bounds": (30.963, 31.163, -8.015, -7.815)
+        "name": "Talampaya_National_Park_Argentina",
+        "bounds": (-29.910, -29.630, -67.985, -67.675) 
     },
 
-    # ========== 大洋洲与南极洲 (Oceania & Antarctica) ==========
+    # ================= 澳洲：古老大陆的红层奇观 =================
     {
-        "name": "Aoraki_Mount_Cook",
-        "bounds": (-43.695, -43.495, 170.041, 170.241)
+        "name": "Kata_Tjuta_Australia",
+        "bounds": (-25.440, -25.160, 130.565, 130.875)
     },
     {
-        "name": "Puncak_Jaya",
-        "bounds": (-4.183, -3.983, 137.083, 137.283)
+        # 纬度极低，经度补偿跨度缩小至 0.29°
+        "name": "Purnululu_National_Park_Australia",
+        "bounds": (-17.560, -17.280, 128.175, 128.465)
     },
+
+    # ================= 中东/非洲：沙漠里的红色群山 =================
     {
-        "name": "Mount_Vinson",
-        "bounds": (-78.625, -78.425, -85.717, -85.517)
+        "name": "Wadi_Rum_Jordan",
+        "bounds": (29.430, 29.710, 35.265, 35.575)
     }
 ]
 

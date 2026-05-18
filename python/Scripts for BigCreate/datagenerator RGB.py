@@ -4,11 +4,10 @@ from rasterio.windows import Window
 import numpy as np
 
 # ================= 1. 配置参数 =================
-# ⚠️ 注意修改这里的输入和输出路径，避免覆盖你的高度图数据
-INPUT_DIR = "D:\File\Research\dataset\RGB from CDSE"  
-OUTPUT_DIR = "D:\File\Research\dataset\Test3_RGB" 
+INPUT_DIR = "D:\WorkSpace\Research\dataset\RGB from CDSE"  
+OUTPUT_DIR = "D:\WorkSpace\Research\dataset\Test3_RGB" 
 PATCH_SIZE = 512
-STRIDE = 256 # 步长 64
+STRIDE = 128
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 tif_files = [f for f in os.listdir(INPUT_DIR) if f.endswith('.tif')]
