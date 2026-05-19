@@ -2,6 +2,7 @@ import os
 import numpy as np
 import tifffile
 import cv2
+from tqdm import tqdm  # 【新增】导入 tqdm 库
 
 # 设置你的输入和输出文件夹路径
 input_folder = "D:\WorkSpace\Research\dataset\Test2"  # 替换成你的 TIFF 文件夹
@@ -13,12 +14,10 @@ if not os.path.exists(output_folder):
 # 获取所有 tif 文件
 tif_files = [f for f in os.listdir(input_folder) if f.endswith('.tif')]
 
-for file_name in tif_files:
+# 【修改】使用 tqdm 包装 tif_files 列表，并添加一段描述文字
+for file_name in tqdm(tif_files, desc="转换 TIFF 到 PNG"):
     input_path = os.path.join(input_folder, file_name)
     output_path = os.path.join(output_folder, file_name.replace('.tif', '.png'))
-    
-    # 【新增】打印当前正在处理的文件名，这样报错时你就知道是哪个文件的问题了
-    #print(f"正在处理: {file_name} ...")
     
     try:
         # 1. 读取高精度 TIFF 数据
@@ -43,8 +42,8 @@ for file_name in tif_files:
         cv2.imwrite(output_path, img_16bit)
         
     except Exception as e:
-        # 【新增】如果报错，打印出具体的错误信息并跳过该文件，继续处理下一个
-        print(f"❌ 读取或处理文件 {file_name} 时失败，原因: {e}")
+        # 【修改】使用 tqdm.write 替代 print，防止输出信息破坏进度条的显示界面
+        tqdm.write(f"读取或处理文件 {file_name} 时失败，原因: {e}")
         continue
     
 print("批量转换完成！")

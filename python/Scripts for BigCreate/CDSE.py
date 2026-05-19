@@ -23,109 +23,67 @@ PROCESS_URL = "https://sh.dataspace.copernicus.eu/api/v1/process"
 # ================= 2. 定义批量下载的区域数组 =================
 # 包含 50 个高山和复杂地形的列表
 input_regions = [
-    # ================= 联合国教科文组织“中国丹霞”世界自然遗产 =================
+    # ================= 1. 中国 - 极致的高大沙山与复合沙丘 =================
     {
-        "name": "Danxia_Mountain_Guangdong",
-        "bounds": (24.885, 25.165, 113.570, 113.880)
+        # 巴丹吉林沙漠核心区 (Badain Jaran Desert) - 拥有世界上最高的静止沙丘（必鲁图峰），沙山与湖泊相间分布，高程起伏惊人
+        "name": "Badain_Jaran_Mega_Dunes_InnerMongolia",
+        "bounds": (39.500, 40.100, 102.000, 102.800) # lat_diff: 0.60, lon_diff: 0.80
     },
     {
-        "name": "Wuyi_Mountain_Fujian",
-        "bounds": (27.510, 27.790, 117.795, 118.105)
+        # 塔克拉玛干沙漠腹地 (Taklamakan Desert) - 世界第二大流动沙漠，密集的复合型新月形沙丘链和巨大的沙垄
+        "name": "Taklamakan_Barchan_Dunes_Xinjiang",
+        "bounds": (38.700, 39.300, 82.700, 83.500) # lat_diff: 0.60, lon_diff: 0.80
     },
     {
-        "name": "Longhu_Mountain_Jiangxi",
-        "bounds": (27.940, 28.220, 116.815, 117.125)
-    },
-    {
-        "name": "Langshan_Mountain_Hunan",
-        "bounds": (26.210, 26.490, 110.695, 111.005)
-    },
-    {
-        "name": "Chishui_Danxia_Guizhou",
-        "bounds": (28.310, 28.590, 105.845, 106.155)
-    },
-    {
-        "name": "Taining_Danxia_Fujian",
-        "bounds": (26.730, 27.010, 116.945, 117.255)
-    },
-    {
-        "name": "Jianglang_Mountain_Zhejiang",
-        "bounds": (28.390, 28.670, 118.405, 118.715)
+        # 库木塔格沙漠 (Kumtag Desert) - 典型的羽毛状沙丘，风沙地貌的“活化石”，沙垄排列极具几何规律
+        "name": "Kumtag_Feather_Dunes_Xinjiang",
+        "bounds": (42.400, 43.000, 90.000, 90.800) # lat_diff: 0.60, lon_diff: 0.80
     },
 
-    # ================= 中国西北干旱/高原型 著名丹霞 =================
+    # ================= 2. 中东 - 浩瀚的流动沙海 =================
     {
-        # 纬度升高，经度补偿跨度增加至 0.34°
-        "name": "Zhangye_Danxia_Gansu",
-        "bounds": (38.810, 39.090, 99.980, 100.320)
+        # 鲁卜哈利沙漠 / 空旷四分之一 (Rub' al Khali, Saudi Arabia/UAE) - 世界上最大的连续沙海，包含极其壮观的巨型线状和星状复合沙丘
+        "name": "Empty_Quarter_Star_Dunes_Arabia",
+        "bounds": (19.700, 20.300, 52.600, 53.400) # lat_diff: 0.60, lon_diff: 0.80
     },
     {
-        "name": "Binggou_Danxia_Gansu",
-        "bounds": (38.790, 39.070, 99.700, 100.040)
-    },
-    {
-        # 纬度最高，经度补偿跨度增加至 0.37°
-        "name": "Kuqa_Grand_Canyon_Xinjiang",
-        "bounds": (42.030, 42.310, 82.960, 83.330)
-    },
-    {
-        "name": "Kanbula_Danxia_Qinghai",
-        "bounds": (35.980, 36.260, 101.130, 101.470)
-    },
-    {
-        "name": "Jingbian_Wave_Valley_Shaanxi",
-        "bounds": (37.420, 37.700, 108.590, 108.930)
+        # 伊朗卡维尔盐漠 (Dasht-e Kavir, Iran) - 巨大的干涸盐沼，地表呈现出如同大脑褶皱般的复杂盐壳多边形纹理（需极高精度DEM展现，30m可见宏观波纹）
+        "name": "Dasht_e_Kavir_Salt_Desert_Iran",
+        "bounds": (34.300, 34.900, 54.400, 55.200) # lat_diff: 0.60, lon_diff: 0.80
     },
 
-    # ================= 其他具有独特地貌特征的中国丹霞区域 =================
+    # ================= 3. 非洲 - 撒哈拉与纳米布 =================
     {
-        "name": "Gaoyiling_Chenzhou_Hunan",
-        "bounds": (25.770, 26.050, 112.965, 113.275)
+        # 纳米布沙漠苏丝斯黎 (Sossusvlei, Namib Desert, Namibia) - 世界上最古老的沙漠，以极其高大且边缘锐利的红色星状沙丘闻名
+        "name": "Namib_Sossusvlei_Red_Dunes_Namibia",
+        "bounds": (-25.000, -24.400, 15.000, 15.700) # lat_diff: 0.60, lon_diff: 0.70
     },
     {
-        "name": "Jianmen_Pass_Sichuan",
-        "bounds": (32.080, 32.360, 105.390, 105.730)
+        # 撒哈拉大东方沙海 (Grand Erg Oriental, Algeria) - 撒哈拉沙漠中极其广阔的沙海，呈现出连绵不绝的密集圆顶和新月沙丘
+        "name": "Sahara_Grand_Erg_Oriental_Algeria",
+        "bounds": (29.700, 30.300, 6.600, 7.400) # lat_diff: 0.60, lon_diff: 0.80
     },
     {
-        "name": "Qiyun_Mountain_Anhui",
-        "bounds": (29.670, 29.950, 117.865, 118.175)
-    },
-
-    # ================= 北美洲：红岩峡谷与孤峰巨怪 =================
-    {
-        "name": "Zion_National_Park_USA",
-        "bounds": (37.130, 37.410, -113.140, -112.800)
-    },
-    {
-        "name": "Monument_Valley_USA",
-        "bounds": (36.850, 37.130, -110.260, -109.920)
-    },
-    {
-        "name": "Sedona_Red_Rocks_USA",
-        "bounds": (34.730, 35.010, -111.940, -111.600)
+        # 埃及理查特结构周边 (Richat Structure edge, Mauritania) - 撒哈拉之眼的边缘地带，沙哈拉岩石荒漠与流沙交界处
+        "name": "Sahara_Rocky_Desert_Mauritania",
+        "bounds": (20.800, 21.400, -11.800, -11.000) # lat_diff: 0.60, lon_diff: 0.80
     },
 
-    # ================= 南美洲：干旱区巨型红壁 =================
+    # ================= 4. 澳洲与美洲 - 平行沙垄与极旱荒漠 =================
     {
-        "name": "Talampaya_National_Park_Argentina",
-        "bounds": (-29.910, -29.630, -67.985, -67.675) 
-    },
-
-    # ================= 澳洲：古老大陆的红层奇观 =================
-    {
-        "name": "Kata_Tjuta_Australia",
-        "bounds": (-25.440, -25.160, 130.565, 130.875)
+        # 澳大利亚辛普森沙漠 (Simpson Desert, Australia) - 全球最大的平行沙垄沙漠，数百条笔直的红色沙垄连绵上百公里
+        "name": "Simpson_Parallel_Dunes_Australia",
+        "bounds": (-24.300, -23.700, 136.600, 137.400) # lat_diff: 0.60, lon_diff: 0.80
     },
     {
-        # 纬度极低，经度补偿跨度缩小至 0.29°
-        "name": "Purnululu_National_Park_Australia",
-        "bounds": (-17.560, -17.280, 128.175, 128.465)
+        # 智利阿塔卡马沙漠核心区 (Atacama Desert, Chile) - 地球上最干旱的非极地沙漠，类似火星地表，充满干盐湖、砾漠与风化山体
+        "name": "Atacama_Hyperarid_Desert_Chile",
+        "bounds": (-24.300, -23.700, -68.900, -68.100) # lat_diff: 0.60, lon_diff: 0.80
     },
-
-    # ================= 中东/非洲：沙漠里的红色群山 =================
     {
-        "name": "Wadi_Rum_Jordan",
-        "bounds": (29.430, 29.710, 35.265, 35.575)
+        # 美国死谷国家公园 (Death Valley, USA) - 北美最低点，包含恶水盆地的广阔盐滩、冲积扇以及麦斯奎特平原的沙丘系统
+        "name": "Death_Valley_Basin_USA",
+        "bounds": (36.100, 36.700, -117.200, -116.400) # lat_diff: 0.60, lon_diff: 0.80
     }
 ]
 

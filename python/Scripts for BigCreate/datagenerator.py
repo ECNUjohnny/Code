@@ -7,7 +7,7 @@ import numpy as np
 INPUT_DIR = "D:/WorkSpace/Research/dataset/DEM from CDSE"  # 你的原始数据文件夹
 OUTPUT_DIR = "D:/WorkSpace/Research/dataset/Test2" # 最终数据集输出文件夹
 PATCH_SIZE = 512
-STRIDE = 128 
+STRIDE = 256
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 tif_files = [f for f in os.listdir(INPUT_DIR) if f.endswith('.tif')]
