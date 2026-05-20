@@ -7,10 +7,10 @@ from tqdm import tqdm
 # 1. 配置区 (路径与规则)
 # ==========================================
 # 输入的根目录 (截图中的路径)
-INPUT_DIR = "D:/WorkSpace/Data/outputs/outputs"
+INPUT_DIR = r"D:\WorkSpace\Data\Danxia\outputs"
 
 # 输出的根目录 (它会在这个路径下自动新建三个子文件夹)
-OUTPUT_BASE = "D:/WorkSpace/Data/unet"
+OUTPUT_BASE = r"D:\WorkSpace\Data\temp"
 
 DIR_DEM = os.path.join(OUTPUT_BASE, "dem")
 DIR_RGB = os.path.join(OUTPUT_BASE, "rgb")
@@ -26,7 +26,7 @@ def process_dataset():
     # 获取所有的子文件夹 (例如: 0001_Binggou_Danxia_...)
     subdirs = [d for d in input_path.iterdir() if d.is_dir()]
 
-    print(f"发现 {len(subdirs)} 个数据子文件夹，开始提取与重组...")
+    print(f"发现 {len(subdirs)} 个数据子文件夹，开始提取与重组...\n")
 
     # ==========================================
     # 2. 核心遍历与提取逻辑
@@ -34,8 +34,14 @@ def process_dataset():
     for subdir in tqdm(subdirs, desc="处理进度"):
         folder_name = subdir.name # 获取外层文件夹的名字，用作未来的统一文件名
         
+        cnt = 0
+        flg = 1
+
         # 遍历当前子文件夹内的所有文件
         for file_path in subdir.iterdir():
+            
+            flg = 1
+
             if not file_path.is_file():
                 continue
 
@@ -51,6 +57,7 @@ def process_dataset():
             # ----------------------------------------
             if extension in ['.txt', '.json']:
                 target_path = os.path.join(DIR_TXT, new_filename)
+
                 shutil.copy2(file_path, target_path)
 
             # ----------------------------------------
@@ -62,11 +69,13 @@ def process_dataset():
                 # 假设：高度图的文件名里带有 "dem" 或 "height" 字符
                 if 'dem' in filename_lower or 'height' in filename_lower:
                     target_path = os.path.join(DIR_DEM, new_filename)
+
                     shutil.copy2(file_path, target_path)
                 
                 # 假设：纹理卫星图的文件名里带有 "rgb" 或 "texture" 或 "sat" 字符
                 elif 'rgb' in filename_lower or 'texture' in filename_lower or 'sat' in filename_lower:
                     target_path = os.path.join(DIR_RGB, new_filename)
+                
                     shutil.copy2(file_path, target_path)
                 
                 else:
@@ -74,7 +83,10 @@ def process_dataset():
                     # 会走到这里，你需要修改上面的 if 关键词来精确匹配。
                     pass
 
-    print(f"\n提取完成！所有数据已分类保存在: {OUTPUT_BASE}")
+            # if flg: cnt += 1
+
+    print(f"\n提取完成! 数据已分类保存在: {OUTPUT_BASE}")
 
 if __name__ == '__main__':
+    
     process_dataset()
