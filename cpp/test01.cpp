@@ -13,23 +13,9 @@ using namespace std;
 typedef long long ll;
 typedef unsigned long long ull;
 
-const int N = 2e5 + 5;
-int t, n;
-int a[N], b[N];
 
-void solve()
-{
-    
-}
 
 int main() 
 {
-    scanf("%d", &t);
     
-    while (t--)
-    {
-        solve();
-    }
-
-    return 0;
 }

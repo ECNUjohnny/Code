@@ -2,25 +2,41 @@ import os
 import shutil
 from pathlib import Path
 from tqdm import tqdm
+import random
 
 # ==========================================
 # 1. 配置区 (路径与规则)
 # ==========================================
 # 输入的根目录 (截图中的路径)
-INPUT_DIR = r"D:\WorkSpace\Data\Danxia\outputs"
+INPUT_DIR = r"D:\WorkSpace\Data\outputs\outputs"
 
 # 输出的根目录 (它会在这个路径下自动新建三个子文件夹)
-OUTPUT_BASE = r"D:\WorkSpace\Data\temp"
+OUTPUT_BASE = r"D:\WorkSpace\Data\unet"
+FILTER = r"D:\WorkSpace\Data\outputs\outputs\has_urban"
 
 DIR_DEM = os.path.join(OUTPUT_BASE, "dem")
 DIR_RGB = os.path.join(OUTPUT_BASE, "rgb")
 DIR_TXT = os.path.join(OUTPUT_BASE, "txt")
+
+mp = {}
+
+def load_filter():
+
+    filter_path = Path(FILTER)
+
+    subdirs = [d for d in filter_path.iterdir() if d.is_dir()]
+
+    for subdir in subdirs:
+
+        mp[subdir.name] = 1
 
 def process_dataset():
     # 自动创建目标文件夹
     os.makedirs(DIR_DEM, exist_ok=True)
     os.makedirs(DIR_RGB, exist_ok=True)
     os.makedirs(DIR_TXT, exist_ok=True)
+
+    load_filter()
 
     input_path = Path(INPUT_DIR)
     # 获取所有的子文件夹 (例如: 0001_Binggou_Danxia_...)
@@ -34,13 +50,17 @@ def process_dataset():
     for subdir in tqdm(subdirs, desc="处理进度"):
         folder_name = subdir.name # 获取外层文件夹的名字，用作未来的统一文件名
         
-        cnt = 0
-        flg = 1
+        if folder_name[0] != '0':
+            
+            continue
+
+        if folder_name in mp:
+
+            continue
 
         # 遍历当前子文件夹内的所有文件
         for file_path in subdir.iterdir():
             
-            flg = 1
 
             if not file_path.is_file():
                 continue
@@ -83,7 +103,6 @@ def process_dataset():
                     # 会走到这里，你需要修改上面的 if 关键词来精确匹配。
                     pass
 
-            # if flg: cnt += 1
 
     print(f"\n提取完成! 数据已分类保存在: {OUTPUT_BASE}")
 
