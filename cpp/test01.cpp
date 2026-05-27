@@ -13,18 +13,14 @@ using namespace std;
 typedef long long ll;
 typedef unsigned long long ull;
 
-const int N = 1e5 + 5;
-int t, n, p[N], s[N];
-
-int gcd(int a, int b)
-{
-    return b ? gcd(b, a % b) : a;
-}
+const int N = 2e5 + 5;
+const ll mod = 998244353;
+int t;
 
 void solve()
 {
-    scanf("%d", &n);
     
+
 }
 
 int main() 
