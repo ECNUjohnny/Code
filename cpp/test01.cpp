@@ -25,6 +25,12 @@ struct inter
         return d < o.d;
     }
 };
+<<<<<<< Updated upstream
+=======
+const ll mod = 998244353;
+
+int t;
+>>>>>>> Stashed changes
 
 void solve()
 {
@@ -80,6 +86,10 @@ void solve()
 int main() 
 {
     scanf("%d", &t);
+
+    
+
+    // printf("%lld\n", c[1][13]);
 
     while (t--)
     {
