@@ -14,82 +14,75 @@ typedef long long ll;
 typedef unsigned long long ull;
 
 const int N = 2e5 + 5;
-int t, n, k, x, a[N];
-
-struct inter
-{
-    int d, len, t, m, l, r;
-    bool operator < (const inter &o) const
-    {
-        if (d == o.d) return t < o.t;
-        return d < o.d;
-    }
-};
-<<<<<<< Updated upstream
-=======
-const ll mod = 998244353;
-
-int t;
->>>>>>> Stashed changes
+int t, n, k, a[N], b[N];
 
 void solve()
 {
-    scanf("%d%d%d", &n, &k, &x);
+    scanf("%d%d", &n, &k);
     for (int i = 1; i <= n; i++) scanf("%d", &a[i]);
 
-    sort(a + 1, a + n + 1);
-
-    priority_queue<inter> q;
-
-    for (int i = 1; i < n; i++) q.push({a[i + 1] - a[i], a[i + 1] - a[i], 1, 0, a[i], a[i + 1]});
-    if (a[1] > 0) q.push({a[1], a[1], 2, 0, 0, a[1]});
-    if (a[n] < x) q.push({x - a[n], x - a[n], 3, 0, a[n], x});
-
-    for (int i = 1; i <= k; i++)
+    if (k == 1)
     {
-        inter p = q.top();
-        q.pop();
+        puts("yes");
+        return;
+    }
 
-        if (p.t == 1)
+    memcpy(b, a, sizeof(a));
+
+    sort(b + 1, b + n + 1);
+
+    int kth = b[k];
+    int tot = 0;
+
+    for (int i = 1; i <= n; i++)
+    {
+        if (a[i] > kth) continue;
+        b[++tot] = a[i];
+    }
+
+    int l = 1, r = tot;
+    int sum = 0;
+
+    while (l < r)
+    {
+        if (b[l] == b[r])
         {
-            q.push({max((p.len - p.m) >> 1, 0), p.len, 1, p.m + 1, p.l, p.r});
+            r++, l--;
+            continue;
         }
         else
         {
-            q.push({max(p.len - p.m - 1, 0), p.len, p.t, p.m + 1, p.l, p.r});
+            if (b[l] != kth && b[r] != kth)
+            {
+                puts("no");
+                return;
+            } 
+            else if (b[l] == kth)
+            {
+                l++;
+                sum++;
+            }
+            else if (b[r] == kth)
+            {
+                r--;
+                sum++;
+            }
+            
+            if (sum > tot - k + 1)
+            {
+                puts("no");
+                return;
+            }
         }
+
     }
 
-    while (q.size())
-    {
-        inter p = q.top();
-        q.pop();
-
-        if (p.t == 1)
-        {
-            int start = p.l + p.d;
-            for (int i = 1; i <= p.m; i++) printf("%d ", start + i);
-        }
-        else if (p.t == 2)
-        {
-            for (int i = 1; i <= p.m; i++) printf("%d ", i - 1);
-        }
-        else
-        {
-            for (int i = 1; i <= p.m; i++) printf("%d ", x - i + 1);
-        }
-    }
-
-    puts("");
+    puts("yes");
 }
 
 int main() 
 {
     scanf("%d", &t);
-
-    
-
-    // printf("%lld\n", c[1][13]);
 
     while (t--)
     {
