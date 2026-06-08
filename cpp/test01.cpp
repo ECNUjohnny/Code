@@ -13,12 +13,15 @@ using namespace std;
 typedef long long ll;
 typedef unsigned long long ull;
 
+const int N = 2e5 + 5;
 int t;
+ll a[N];
 
 void solve()
 {
     
-}
+
+}   
 
 int main() 
 {
