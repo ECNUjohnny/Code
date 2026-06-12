@@ -1,147 +1,222 @@
-"""
-地形双模态自动打标脚本 (Auto-Captioning)
-将成对的高度图和卫星纹理图发给视觉大模型，生成高质量的 Text Prompt。
-"""
-
-import os
-import base64
 import json
+import base64
+import io
+import cv2
+import numpy as np
 from pathlib import Path
+from PIL import Image
 from tqdm import tqdm
 from openai import OpenAI
+import re
+
+cv2.utils.logging.setLogLevel(cv2.utils.logging.LOG_LEVEL_SILENT)
 
 # ==========================================
-# 1. 配置区域 (请根据你的实际情况修改)
+# 1. 基础配置
 # ==========================================
-# 你的 API Key 和 Base URL (如果是官方 OpenAI 则不用填 BASE_URL)
-# 如果你用国内的中转 API 或阿里云通义千问等兼容接口，请替换为对应的 URL
-API_KEY = "sk-你的API_KEY"
-BASE_URL = "https://api.openai.com/v1" # 例如 Qwen 是 "https://dashscope.aliyuncs.com/compatible-mode/v1"
-MODEL_NAME = "gpt-4o" # 或者 "qwen-vl-max" 等支持视觉的模型
+API_KEY = "sk-local-test" 
+BASE_URL = "http://127.0.0.1:8000/v1" 
+MODEL_NAME = "qwen-vl" 
 
-# 数据路径设定
-DEM_DIR = "./data/origin/heightmaps"    # 高度图所在目录
-RGB_DIR = "./data/origin/satellite"     # 卫星图所在目录
-OUTPUT_FILE = "./data/process/captions.jsonl" # 输出文件 (JSON Lines 格式，方便断点续传)
+# 请修改为你实际的 dataset 根目录
+BASE_DIR = Path(r"E:\WorkSpace\Data\unet_test")
+RGB_DIR = BASE_DIR / "rgb"
+DEM_DIR = BASE_DIR / "dem"
+TXT_DIR = BASE_DIR / "txt"
 
-# 假设高度图和卫星图文件名完全一致，例如： terrain_001.png
-# 如果前后缀不同，可以在下方的匹配逻辑里修改
+# 自动创建 txt 输出文件夹
+TXT_DIR.mkdir(parents=True, exist_ok=True)
 
-# ==========================================
-# 2. 核心 Prompt 引擎 (极其重要：决定了你 U-Net 的学习质量)
-# ==========================================
-SYSTEM_PROMPT = """
-你是一位顶级的地质学家和地理信息系统（GIS）专家。
-我现在会给你两张对齐的地形图像：
-第一张是 DEM 高度图（灰度图，越亮代表海拔越高）。
-第二张是 RGB 卫星纹理图（展示真实地表覆盖和颜色）。
+DANXIA = r"E:\WorkSpace\Data\dataset\Danxia\outputs"
+KARST = r"E:\WorkSpace\Data\dataset\Karst\Karst"
+LOESS = r"E:\WorkSpace\Data\dataset\Huangtu\Huangtu"
+ICE = r"E:\WorkSpace\Data\dataset\IceMountain\IceMountain"
+DESERT = r"E:\WorkSpace\Data\dataset\desert\desert"
+YARDANG = r"E:\WorkSpace\Data\dataset\Yadan\Yadan"
+INPUT = r"E:\WorkSpace\Data\unet\txt"
 
-请仔细观察两张图的空间对应关系，并用一段简洁、专业的英文（不超过 50 个单词）描述该地貌。
-你的描述必须包含以下三个维度的信息：
-1. 宏观地貌类型（如峡谷、平原、火山、丹霞、丘陵、山脉等）。
-2. 高度图呈现的几何特征（如陡峭的悬崖、平缓的坡度、深邃的沟壑等）。
-3. 卫星图呈现的表面纹理与颜色（如红色的砂岩、绿色的植被覆盖、干旱的裸露岩石等）。
+danxia = set()
+karst = set()
+loess = set()
+ice = set()
+desert = set()
+yardang = set()
 
-示例输出格式：
-"A top-down aerial view of a Danxia landform, featuring deep narrow canyons with steep vertical cliffs visible in the heightmap, covered by prominent red sandstone textures and sparse green vegetation in the satellite imagery."
+client = OpenAI(api_key=API_KEY, base_url=BASE_URL)
 
-直接输出英文描述，不要包含任何多余的解释、寒暄或 Markdown 格式。
-"""
 
-# ==========================================
-# 3. 工具函数
-# ==========================================
-def encode_image_to_base64(image_path: str) -> str:
-    """将图片文件转换为 Base64 编码的字符串"""
-    with open(image_path, "rb") as image_file:
-        return base64.b64encode(image_file.read()).decode('utf-8')
+def extract_name(terrain_set: set, dir_path: str):
+    path = Path(dir_path)
 
-def get_existing_processed_files(output_file: str) -> set:
-    """读取已处理的文件列表，用于断点续传"""
-    processed = set()
-    if os.path.exists(output_file):
-        with open(output_file, 'r', encoding='utf-8') as f:
-            for line in f:
-                try:
-                    data = json.loads(line.strip())
-                    processed.add(data["filename"])
-                except:
-                    pass
-    return processed
+    dirs = [d for d in path.iterdir() if d.is_dir()]
+
+    for dir in tqdm(dirs, desc='name', ncols=100):
+        terrain_set.add(dir.name)
+
+
+def init():
+    extract_name(danxia, DANXIA)
+    extract_name(karst, KARST)
+    extract_name(ice, ICE)
+    extract_name(desert, DESERT)
+    extract_name(yardang, YARDANG)
+    extract_name(loess, LOESS)
 
 # ==========================================
-# 4. 主执行逻辑
+# 2. 图像解码与转换模块
 # ==========================================
-def main():
-    client = OpenAI(api_key=API_KEY, base_url=BASE_URL)
+def encode_img(path: Path) -> str:
+    # 使用纯字符串转换，防止 OpenCV 对 Path 对象报错
+    img = cv2.imread(str(path), cv2.IMREAD_UNCHANGED)
+    if img is None:
+        raise FileNotFoundError(f"Failed to read: {path}")
+
+    # 判断是 3 通道 (RGB) 还是单通道 (DEM)
+    if len(img.shape) == 3: 
+        # OpenCV 默认读取彩色图为 BGR，必须转回 RGB，否则大模型会看错颜色
+        if img.shape[2] == 3:
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        elif img.shape[2] == 4:
+            img = cv2.cvtColor(img, cv2.COLOR_BGRA2RGB)
+        img_8 = img.astype(np.uint8)
+    else: 
+        # DEM 相对值转换逻辑
+        if img.dtype == np.uint16:
+            img_8 = (img / 256.0).clip(0, 255).astype(np.uint8)
+        elif img.dtype in [np.float16, np.float32, np.float64]:
+            img_8 = (img * 255.0).clip(0, 255).astype(np.uint8)
+        else:
+            img_8 = img.astype(np.uint8)
     
-    # 获取所有 DEM 文件
-    dem_files = [f for f in os.listdir(DEM_DIR) if f.endswith(('.png', '.jpg', '.jpeg'))]
-    processed_files = get_existing_processed_files(OUTPUT_FILE)
+    pil_img = Image.fromarray(img_8)
+    if pil_img.mode != 'RGB':
+        pil_img = pil_img.convert('RGB')
     
-    # 过滤掉已经处理过的文件
-    files_to_process = [f for f in dem_files if f not in processed_files]
-    print(f"总计找到 {len(dem_files)} 个文件。")
-    print(f"已跳过 {len(processed_files)} 个，还需处理 {len(files_to_process)} 个。")
-    
-    if len(files_to_process) == 0:
-        print("所有图片均已打标完成！")
-        return
+    buf = io.BytesIO()
+    pil_img.save(buf, format="JPEG")
+    b64_str = base64.b64encode(buf.getvalue()).decode('utf-8')
+    return f"data:image/jpeg;base64,{b64_str}"
 
-    # 打开文件句柄准备追加写入
-    with open(OUTPUT_FILE, 'a', encoding='utf-8') as out_f:
-        pbar = tqdm(files_to_process, desc="请求大模型 API 打标中")
+# ==========================================
+# 3. 核心流水线
+# ==========================================
+def process_dataset():
+    # 抓取所有 rgb 目录下的图片
+    rgb_files = [f for f in RGB_DIR.iterdir() if f.suffix.lower() in ['.png', '.tif', '.jpg']]
+
+    cnt = 0
+
+    init()
+
+    # 使用 ncols 锁死进度条宽度，防止终端瀑布流
+    for rgb_file in tqdm(rgb_files, desc="Annotating", ncols=100, mininterval=0.5):
+        name = rgb_file.stem
+        txt_file = TXT_DIR / f"{name}.txt"
         
-        for filename in pbar:
-            dem_path = os.path.join(DEM_DIR, filename)
-            rgb_path = os.path.join(RGB_DIR, filename) # 假设同名
+        # if cnt > 2: break
+
+        cnt += 1
+
+        # 断点续传：如果 txt 已经存在，直接跳过
+        if txt_file.exists():
+            continue
             
-            if not os.path.exists(rgb_path):
-                tqdm.write(f"⚠️ 警告: 找不到对应的卫星图 {rgb_path}，跳过此文件。")
-                continue
+        # 自动匹配同名的 dem 图片（兼容后缀可能不同的情况）
+        dem_file = None
+        for ext in ['.png', '.tif', '.jpg']:
+            temp_path = DEM_DIR / f"{name}{ext}"
+            if temp_path.exists():
+                dem_file = temp_path
+                break
                 
+        if not dem_file:
+            tqdm.write(f"Warning: No matching DEM found for {name}")
+            continue
+            
+        try:
+            # 编码两张图片
+            b64_rgb = encode_img(rgb_file)
+            b64_dem = encode_img(dem_file)
+            
+            if name in danxia: catagory = "danxia"
+            elif name in karst: catagory = "karst"
+            elif name in ice: catagory = "ice mountain"
+            elif name in desert: catagory = "desert"
+            elif name in yardang: catagory = "yardang"
+            elif name in loess: catagory = "loess"
+
+            # 设置极简 Prompt
+            sys_msg = "You are an expert geologist and geographic terrain analyst acting as a strict JSON API. Output ONLY valid JSON."
+            usr_msg = (
+                "Image 1 is a DEM (height map). Image 2 is an RGB texture map. "
+                f"Hint: This area belongs to {catagory}."
+                "As an expert, output a pure JSON object exactly like this template to depict the precise geological and visual features: "
+                '{"topology": "...", "erosion": "...", "slope_feel": "...", "surface": "...", "color_palette": "..."}. '
+                "For 'color_palette', output ONLY 1 to 3 essential color adjectives (e.g., 'dusty yellow and gray')"
+                "Focus exclusively on natural geographical features. Use concise English phrases."
+            )
+            
+            messages = [
+                {"role": "system", "content": sys_msg},
+                # 伪造用户的第一次提问
+                {"role": "user", "content": "Analyze the images and output JSON."},
+                # 伪造模型的第一次完美回答（没有一句废话，直接输出 JSON）
+                {"role": "assistant", "content": '{\n  "topology": "rolling hills",\n  "erosion": "shallow gullies",\n  "slope_feel": "gentle inclines",\n  "surface": "sparse vegetation"\n}'},
+                # 真实的提问开始
+                {"role": "user", "content": [
+                    {"type": "text", "text": usr_msg},
+                    {"type": "image_url", "image_url": {"url": b64_dem}},
+                    {"type": "image_url", "image_url": {"url": b64_rgb}}
+                ]}
+            ]
+
+            # 发送给 Qwen
+            resp = client.chat.completions.create(
+                model=MODEL_NAME,
+                messages=messages,
+                max_tokens=500,
+                temperature=0.15,
+                response_format={ "type": "json_object" }
+            )
+            
+            # 清洗思考过程
+            ans = resp.choices[0].message.content.strip()
+            
+            # 终极提取方案：用正则强行挖出 JSON 块
             try:
-                base64_dem = encode_image_to_base64(dem_path)
-                base64_rgb = encode_image_to_base64(rgb_path)
+                # 寻找从第一个 { 开始，到最后一个 } 结束的所有内容 (re.DOTALL 允许跨行匹配)
+                match = re.search(r'\{.*\}', ans, re.DOTALL)
                 
-                # 组装发给大模型的 payload
-                response = client.chat.completions.create(
-                    model=MODEL_NAME,
-                    messages=[
-                        {
-                            "role": "system",
-                            "content": SYSTEM_PROMPT
-                        },
-                        {
-                            "role": "user",
-                            "content": [
-                                {"type": "text", "text": "第一张图是高度图，第二张图是对应的卫星图。请描述："},
-                                {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{base64_dem}"}},
-                                {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{base64_rgb}"}}
-                            ]
-                        }
-                    ],
-                    max_tokens=100, # 描述不需要太长，省钱省时间
-                    temperature=0.3 # 降低随机性，保证描述的客观准确
-                )
-                
-                # 提取模型生成的文本
-                caption = response.choices[0].message.content.strip()
-                
-                # 保存结果
-                result_dict = {
-                    "filename": filename,
-                    "prompt": caption
-                }
-                out_f.write(json.dumps(result_dict, ensure_ascii=False) + '\n')
-                out_f.flush() # 强制立刻写入硬盘，防止中途断电丢失
-                
-                # 在进度条上顺便展示一下刚生成的 prompt
-                pbar.set_postfix({"Latest": caption[:20] + "..."})
-                
+                if match:
+                    json_str = match.group(0)
+                    data = json.loads(json_str)
+                    
+                    # 组装 CLIP 友好的自然语言 (注意 features 改成 is 啦)
+                    final_prompt = (
+                        f"A view of {data.get('topology', 'terrain')}, "
+                        f"characterized by {data.get('erosion', 'erosion')}. "
+                        f"The terrain is {data.get('slope_feel', 'slopes')}, "
+                        f"featuring a color palette of {data.get('color_palette', 'natural hues')}, " # 
+                        f"showing {data.get('surface', 'surface')}."
+                    )
+                else:
+                    raise ValueError("未在回复中找到 JSON 结构")
+                    
             except Exception as e:
-                tqdm.write(f"❌ 处理文件 {filename} 时发生网络或 API 错误: {e}")
-                # 发生错误不停机，继续尝试下一个
+                # 如果模型彻底发疯连 {} 都没输出，写入一条短警告，防止覆盖大量乱码
+                tqdm.write(f"Warning: JSON 解析失败 [{name}] - {e}")
+                tqdm.write(f"Original output: {ans[:100]}\n")
+                final_prompt = f"A view of terrain, showing natural surface." # 极其安全的保底 Prompt
+            
+            # 写入对应 txt 文件
+            with open(txt_file, 'w', encoding='utf-8') as f:
+                f.write(final_prompt)
+                
+        except Exception as e:
+            # 使用 tqdm.write 打印错误，不会破坏进度条
+            tqdm.write(f"Error processing {name}: {e}")
 
 if __name__ == "__main__":
-    main()
+    print("Initializing Auto-Annotation Pipeline...")
+    process_dataset()
+    print("Pipeline Finished.")
