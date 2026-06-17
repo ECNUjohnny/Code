@@ -29,11 +29,10 @@ TXT_DIR.mkdir(parents=True, exist_ok=True)
 
 DANXIA = r"E:\WorkSpace\Data\dataset\Danxia\outputs"
 KARST = r"E:\WorkSpace\Data\dataset\Karst\Karst"
-LOESS = r"E:\WorkSpace\Data\dataset\Huangtu\Huangtu"
+LOESS = r"E:\WorkSpace\Data\dataset\Huangtu\Test3"
 ICE = r"E:\WorkSpace\Data\dataset\IceMountain\IceMountain"
 DESERT = r"E:\WorkSpace\Data\dataset\desert\desert"
 YARDANG = r"E:\WorkSpace\Data\dataset\Yadan\Yadan"
-INPUT = r"E:\WorkSpace\Data\unet\txt"
 
 danxia = set()
 karst = set()
@@ -48,7 +47,7 @@ client = OpenAI(api_key=API_KEY, base_url=BASE_URL)
 def extract_name(terrain_set: set, dir_path: str):
     path = Path(dir_path)
 
-    dirs = [d for d in path.iterdir() if d.is_dir()]
+    dirs = [d for d in path.iterdir()]
 
     for dir in tqdm(dirs, desc='name', ncols=100):
         terrain_set.add(dir.name)
@@ -113,14 +112,13 @@ def process_dataset():
         name = rgb_file.stem
         txt_file = TXT_DIR / f"{name}.txt"
         
-        # if cnt > 2: break
-
-        cnt += 1
 
         # 断点续传：如果 txt 已经存在，直接跳过
         if txt_file.exists():
             continue
             
+        cnt += 1
+
         # 自动匹配同名的 dem 图片（兼容后缀可能不同的情况）
         dem_file = None
         for ext in ['.png', '.tif', '.jpg']:
@@ -138,18 +136,18 @@ def process_dataset():
             b64_rgb = encode_img(rgb_file)
             b64_dem = encode_img(dem_file)
             
-            if name in danxia: catagory = "danxia"
-            elif name in karst: catagory = "karst"
-            elif name in ice: catagory = "ice mountain"
-            elif name in desert: catagory = "desert"
-            elif name in yardang: catagory = "yardang"
-            elif name in loess: catagory = "loess"
+            if name in danxia: category = "danxia"
+            elif name in karst: category = "karst"
+            elif name in ice: category = "ice mountain"
+            elif name in desert: category = "desert"
+            elif name in yardang: category = "yardang"
+            else: category = "loess"
 
             # 设置极简 Prompt
             sys_msg = "You are an expert geologist and geographic terrain analyst acting as a strict JSON API. Output ONLY valid JSON."
             usr_msg = (
                 "Image 1 is a DEM (height map). Image 2 is an RGB texture map. "
-                f"Hint: This area belongs to {catagory}."
+                f"Hint: This area belongs to {category}."
                 "As an expert, output a pure JSON object exactly like this template to depict the precise geological and visual features: "
                 '{"topology": "...", "erosion": "...", "slope_feel": "...", "surface": "...", "color_palette": "..."}. '
                 "For 'color_palette', output ONLY 1 to 3 essential color adjectives (e.g., 'dusty yellow and gray')"
@@ -215,6 +213,8 @@ def process_dataset():
         except Exception as e:
             # 使用 tqdm.write 打印错误，不会破坏进度条
             tqdm.write(f"Error processing {name}: {e}")
+
+    print(f"{cnt} prompts generated")
 
 if __name__ == "__main__":
     print("Initializing Auto-Annotation Pipeline...")

@@ -1,68 +1,88 @@
 import os
-from tqdm import tqdm
-import shutil
+
+os.environ['TORCH_HOME'] = r'D:\Temp\checkpoint'
+
+import torch
+import numpy as np
+from PIL import Image
 from pathlib import Path
+from tqdm import tqdm
 
-# ==========================================
-# 1. 配置区
-# ==========================================
-INPUT = r"D:\WorkSpace\Data\Yadan\Yadan"
-OUTPUT = r"D:\WorkSpace\Data\Yadan"
+from transformers.models.bert.modeling_bert import BertModel
+if not hasattr(BertModel, 'get_head_mask'):
+    # 塞入一个空函数，防止 GroundingDINO 报错
+    BertModel.get_head_mask = lambda self, *args, **kwargs: None
 
-# 存放你需要匹配的字符串（关键词）。
-# 虽然你原来写的是 {}，但我建议这里用列表 [] 或集合 {} 存放关键词更直观。
-# 如果你坚持用字典，这段代码依然有效（它会自动匹配字典的键 key）。
-mp = ["Lenghu_Yardang_Qaidam_Qinghai", 
-      "Wusute_Water_Yardang_Qaidam_Qinghai", 
-      "Dunhuang_Yardang_Geopark_Gansu", 
-      "Bailongdui_Yardang_LopNur_Xinjiang",
-      "Urho_Ghost_City_Karamay_Xinjiang",
-      "Kaluts_Mega_Yardang_Lut_Desert_Iran",
-      "Borkou_Mega_Yardang_Sahara_Chad",
-      "White_Desert_Yardang_Farafra_Egypt",
-      "Kharga_Linear_Yardang_Egypt",
-      "Ica_Valley_Coastal_Yardang_Peru",
-      "Pumice_Stone_Yardang_Argentina",
-    ] 
+# 导入 SAM-Geo 的文本分割模块
+from samgeo.text_sam import LangSAM
 
+def main():
+    print("正在加载 LangSAM 大模型")
+    sam = LangSAM()
 
-def process():
-    input_path = Path(INPUT)
-    output_path = Path(OUTPUT)
+    # 路径配置
+    input_dir = Path(r"E:\WorkSpace\Data\temp\rgb1")   
+    output_dir = Path(r"E:\WorkSpace\Data\temp\mask") # 建议存在新文件夹
+    output_dir.mkdir(parents=True, exist_ok=True)
 
-    # 确保总的输出目录是存在的
-    output_path.mkdir(parents=True, exist_ok=True)
+    # 1. 定义类别字典 (机器读的绝对数值 ID)
+    terrain_classes = {
+        "rocks": 1,     # 让 SAM 去找 Prompt 里的“暗色粗糙岩石”
+        "dirt": 2,  # 让 SAM 去找 Prompt 里的“红褐色土地”
+        "sand": 3   # 让 SAM 去找 Prompt 里的“浅灰色沟壑”
+    }
 
-    subdirs = [d for d in input_path.iterdir() if d.is_dir()]
+    # 2. 定义彩色调色板 (人眼看的 RGB 颜色)
+    # 严格按照 ID (0, 1, 2, 3...) 的顺序排列 [R, G, B, R, G, B...]
+    palette = [
+        0,   0,   0,     # ID 0: Background (纯黑)
+        0,   0,   255,   # ID 1: Water (纯蓝)
+        34,  139, 34,    # ID 2: Forest (森林绿)
+        255, 0,   0,     # ID 3: Building (亮红)
+        128, 128, 128,   # ID 4: Road (灰色)
+        210, 180, 140,   # ID 5: Bare Land (黄褐色/沙土色)
+    ]
+    # PIL 要求调色板必须正好包含 256 个颜色 (256 * 3 = 768 个数值)
+    # 所以我们把剩下的全部用 0 (黑色) 补齐
+    palette += [0] * (768 - len(palette))
 
-    print(f"发现 {len(subdirs)} 个数据子文件夹，开始提取与重组...\n")
+    # 开始批量处理
+    image_paths = list(input_dir.glob("*.png"))
+    print(f"\n找到 {len(image_paths)} 张卫星图，开始生成彩色掩码图...")
 
-    cnt = 0
+    for img_path in tqdm(image_paths):
+        # 创建底图 (全 0 背景)
+        id_map = np.zeros((512, 512), dtype=np.uint8)
 
-    # ==========================================
-    # 2. 核心遍历与匹配逻辑
-    # ==========================================
-    for subdir in tqdm(subdirs, desc="处理进度"):
-        folder_name = subdir.name
+        for class_name, class_id in terrain_classes.items():
+            predict_result = sam.predict(
+                image=str(img_path),
+                text_prompt=class_name,
+                box_threshold=0.1,  
+                text_threshold=0.1
+            )
 
-        # 核心魔法：判断 folder_name 中是否包含 mp 里的任意一个关键词
-        if any(keyword in folder_name for keyword in mp):
-            
-            # 拼装目标路径
-            target_path = output_path / folder_name
+            # 2. 安全拦截：如果模型什么都没找到（返回了 None），直接跳过这个类，去算下一个类
+            if predict_result is None:
+                continue
+                
+            # 3. 如果成功找到了目标，再把它们解包出来
+            masks, boxes, phrases, logits = predict_result
 
-            # 复制整个文件夹到指定位置
-            cnt += 1
-            
-            if not target_path.exists():
-                # shutil.copytree 专门用于复制整个文件夹（包括里面的所有文件）
-                shutil.copytree(subdir, target_path)
-            else:
-                # 为了不打断 tqdm 进度条，这里用 tqdm.write 打印提示（可选）
-                # tqdm.write(f"跳过：{folder_name} (目标文件夹已存在)")
-                pass
+            if masks is not None and len(masks) > 0:
+                class_mask = torch.any(masks, dim=0).cpu().numpy()
+                id_map[class_mask] = class_id
 
-    print(f"{cnt}文件夹已经复制")
+        # 3. 核心优化：给单通道数据穿上“彩色马甲”
+        # 使用 'P' 模式 (Palette) 将 NumPy 数组转为图像
+        mask_img = Image.fromarray(id_map, mode='P')
+        # 注入调色板
+        mask_img.putpalette(palette)
+        
+        # 保存图片
+        mask_img.save(output_dir / f"{img_path.stem}_mask.png")
 
-if __name__ == "__main__": # 注意这里需要加下划线
-    process()
+    print(f"\n全部处理完毕！彩色 Mask 已保存至: {output_dir}")
+
+if __name__ == "__main__":
+    main()

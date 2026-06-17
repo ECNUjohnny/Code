@@ -8,7 +8,7 @@ LOESS = r"E:\WorkSpace\Data\dataset\Huangtu\Huangtu"
 ICE = r"E:\WorkSpace\Data\dataset\IceMountain\IceMountain"
 DESERT = r"E:\WorkSpace\Data\dataset\desert\desert"
 YARDANG = r"E:\WorkSpace\Data\dataset\Yadan\Yadan"
-INPUT = r"E:\WorkSpace\Data\unet\txt"
+INPUT = r"E:\WorkSpace\Data\unet_test\txt"
 
 danxia = set()
 karst = set()
@@ -35,18 +35,19 @@ def init():
 def main():
     init()
 
-    files = Path(INPUT)
+    files = [f for f in Path(INPUT).iterdir()]
 
-    for file in tqdm(files.iterdir(), desc='writing file'):
+
+    for file in tqdm(files, desc='writing file'):
         name = file.stem
-        catagory = "general"
+        category = "general"
 
-        if name in danxia: catagory = "danxia"
-        elif name in karst: catagory = "karst"
-        elif name in ice: catagory = "ice mountain"
-        elif name in desert: catagory = "desert"
-        elif name in yardang: catagory = "yardang"
-        elif name in loess: catagory = "loess"
+        if name in danxia: category = "danxia"
+        elif name in karst: category = "karst"
+        elif name in ice: category = "ice mountain"
+        elif name in desert: category = "desert"
+        elif name in yardang: category = "yardang"
+        else: category = "loess"
 
         with open(file, "r", encoding="utf-8") as f:
             cont = f.read()
@@ -56,7 +57,7 @@ def main():
                 cont = cont[i + 2: ]
                 break
 
-        prefix = f"This is a terrain named {catagory}; "
+        prefix = f"This is a terrain named {category}; "
 
         file.write_text(prefix + cont, encoding='utf-8')
 
