@@ -1,95 +1,181 @@
-import requests
-import os
-import time
-import rasterio
-from rasterio.enums import Resampling
-from rasterio.windows import Window
-import numpy as np
+import bpy
+import array
 
-# ================= 1. 基础配置区 =================
-# 填入你的 OpenTopography API Key
-API_KEY = "b21b7d8e4a0c90d358df7360822b6e76" 
 
-# 定义你要保存的特定文件夹路径 (Windows 路径建议前面加 r，或者使用双斜杠 \\)
-# 例如: r"D:\Unity_Projects\GIS_Data\DEMs"
-SAVE_FOLDER = r"D:/File/Research/Dataset/Opentopography" 
+class CustomRenderEngine(bpy.types.RenderEngine):
+    # These three members are used by Blender to set up the
+    # RenderEngine; define its internal name, visible name and capabilities.
+    bl_idname = "CUSTOM"
+    bl_label = "Custom"
+    bl_use_preview = True
 
-# 确保保存的文件夹存在，如果不存在则自动创建
-os.makedirs(SAVE_FOLDER, exist_ok=True)
+    # Init is called whenever a new render engine instance is created. Multiple
+    # instances may exist at the same time, for example for a viewport and final
+    # render.
+    # Note the generic arguments signature, and the call to the parent class
+    # `__init__` methods, which are required for Blender to create the underlying
+    # `RenderEngine` data.
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.scene_data = None
+        self.draw_data = None
 
-# ================= 2. 目标数据区 =================
-# 将你需要下载的多个区域写成一个列表
-# bounds 的顺序务必保持为: (south, north, west, east) 即 (南纬, 北纬, 西经, 东经)
-target_areas = [
-    # ========== 亚洲 (Asia) ==========
-    {
-        "name": "Yarlung_Tsangpo_Grand_Canyon", # 雅鲁藏布大峡谷 (中国西藏) - 世界最深最长的峡谷之一
-        "bounds": (29.400, 30.100, 94.700, 95.600)
-    },
-    {
-        "name": "Tiger_Leaping_Gorge", # 虎跳峡 (中国云南)
-        "bounds": (27.200, 27.400, 100.050, 100.250)
-    },
-    {
-        "name": "Kali_Gandaki_Gorge", # 卡利甘达基峡谷 (尼泊尔) - 喜马拉雅山脉中的极深峡谷
-        "bounds": (28.500, 28.850, 83.550, 83.850)
-    },
-    
-    # ========== 非洲 (Africa) - 东非大裂谷带 ==========
-    {
-        "name": "Great_Rift_Valley_Ethiopia", # 东非大裂谷 (埃塞俄比亚段)
-        "bounds": (7.000, 10.000, 38.500, 40.500)
-    },
-    {
-        "name": "Great_Rift_Valley_Kenya", # 东非大裂谷 (肯尼亚格雷戈里裂谷段)
-        "bounds": (-2.500, 1.500, 35.500, 36.500)
-    },
-    {
-        "name": "Great_Rift_Valley_Albertine", # 东非大裂谷 (西线阿尔伯特裂谷，坦噶尼喀湖周边)
-        "bounds": (-8.000, -3.000, 29.000, 31.000)
-    },
-    {
-        "name": "Fish_River_Canyon", # 鱼河大峡谷 (纳米比亚) - 非洲最大峡谷
-        "bounds": (-28.000, -27.500, 17.500, 17.850)
-    },
-    {
-        "name": "Blyde_River_Canyon", # 布莱德河峡谷 (南非)
-        "bounds": (-24.650, -24.500, 30.750, 30.900)
-    }
-]
+    # When the render engine instance is destroy, this is called. Clean up any
+    # render engine data here, for example stopping running render threads.
+    def __del__(self):
+        # Own delete code...
+        super().__del__()
 
-print(f"初始化完成，准备将 {len(target_areas)} 个高程图下载至目录: {SAVE_FOLDER}\n")
+    # This is the method called by Blender for both final renders (F12) and
+    # small preview for materials, world and lights.
+    def render(self, depsgraph):
+        scene = depsgraph.scene
+        scale = scene.render.resolution_percentage / 100.0
+        self.size_x = int(scene.render.resolution_x * scale)
+        self.size_y = int(scene.render.resolution_y * scale)
 
-# ================= 3. 循环下载区 =================
-for i, area in enumerate(target_areas, 1):
-    name = area["name"]
-    south, north, west, east = area["bounds"]
-    
-    print(f"[{i}/{len(target_areas)}] 正在向云端请求: {name} ...")
-    
-    # 构造请求 URL
-    url = f"https://portal.opentopography.org/API/globaldem?demtype=NASADEM&south={south}&north={north}&west={west}&east={east}&outputFormat=GTiff&API_Key={API_KEY}"
-    
-    # 将文件夹路径和具体的文件名拼接起来
-    file_path = os.path.join(SAVE_FOLDER, f"{name}.tif")
-    
-    try:
-        # 发送请求
-        response = requests.get(url)
-        
-        if response.status_code == 200:
-            # 成功！写入指定路径的文件
-            with open(file_path, "wb") as f:
-                f.write(response.content)
-            print(f"  -> 下载成功！已保存至: {file_path}")
+        # Fill the render result with a flat color. The frame-buffer is
+        # defined as a list of pixels, each pixel itself being a list of
+        # R,G,B,A values.
+        if self.is_preview:
+            color = [0.1, 0.2, 0.1, 1.0]
         else:
-            print(f"  -> 出错啦: 状态码 {response.status_code}, 错误信息: {response.text}")
-            
-    except Exception as e:
-        print(f"  -> 网络请求发生异常: {e}")
-        
-    # ⚠️ 极其关键的一步：休眠防封禁！
-    # 每次下载完停顿 2-3 秒，做个文明的爬虫。
-    time.sleep(3) 
+            color = [0.2, 0.1, 0.1, 1.0]
 
-print("\n所有下载任务已处理完毕！")
+        pixel_count = self.size_x * self.size_y
+        rect = [color] * pixel_count
+
+        # Here we write the pixel values to the RenderResult
+        result = self.begin_result(0, 0, self.size_x, self.size_y)
+        layer = result.layers[0].passes["Combined"]
+        layer.rect = rect
+        self.end_result(result)
+
+    # For viewport renders, this method gets called once at the start and
+    # whenever the scene or 3D viewport changes. This method is where data
+    # should be read from Blender in the same thread. Typically a render
+    # thread will be started to do the work while keeping Blender responsive.
+    def view_update(self, context, depsgraph):
+        region = context.region
+        view3d = context.space_data
+        scene = depsgraph.scene
+
+        # Get viewport dimensions
+        dimensions = region.width, region.height
+
+        if not self.scene_data:
+            # First time initialization
+            self.scene_data = []
+            first_time = True
+
+            # Loop over all datablocks used in the scene.
+            for datablock in depsgraph.ids:
+                pass
+        else:
+            first_time = False
+
+            # Test which datablocks changed
+            for update in depsgraph.updates:
+                print("Datablock updated: ", update.id.name)
+
+            # Test if any material was added, removed or changed.
+            if depsgraph.id_type_updated('MATERIAL'):
+                print("Materials updated")
+
+        # Loop over all object instances in the scene.
+        if first_time or depsgraph.id_type_updated('OBJECT'):
+            for instance in depsgraph.object_instances:
+                pass
+
+    # For viewport renders, this method is called whenever Blender redraws
+    # the 3D viewport. The renderer is expected to quickly draw the render
+    # with OpenGL, and not perform other expensive work.
+    # Blender will draw overlays for selection and editing on top of the
+    # rendered image automatically.
+    def view_draw(self, context, depsgraph):
+        # Lazily import GPU module, so that the render engine works in
+        # background mode where the GPU module can't be imported by default.
+        import gpu
+
+        region = context.region
+        scene = depsgraph.scene
+
+        # Get viewport dimensions
+        dimensions = region.width, region.height
+
+        # Bind shader that converts from scene linear to display space,
+        gpu.state.blend_set('ALPHA_PREMULT')
+        self.bind_display_space_shader(scene)
+
+        if not self.draw_data or self.draw_data.dimensions != dimensions:
+            self.draw_data = CustomDrawData(dimensions)
+
+        self.draw_data.draw()
+
+        self.unbind_display_space_shader()
+        gpu.state.blend_set('NONE')
+
+
+class CustomDrawData:
+    def __init__(self, dimensions):
+        import gpu
+
+        # Generate dummy float image buffer.
+        self.dimensions = dimensions
+        width, height = dimensions
+
+        pixels = width * height * array.array('f', [0.1, 0.2, 0.1, 1.0])
+        pixels = gpu.types.Buffer('FLOAT', width * height * 4, pixels)
+
+        # Generate texture.
+        self.texture = gpu.types.GPUTexture((width, height), format='RGBA16F', data=pixels)
+
+        # Note: This is just a didactic example.
+        # In this case it would be more convenient to fill the texture with:
+        # self.texture.clear('FLOAT', value=[0.1, 0.2, 0.1, 1.0])
+
+    def __del__(self):
+        del self.texture
+
+    def draw(self):
+        from gpu_extras.presets import draw_texture_2d
+        draw_texture_2d(self.texture, (0, 0), self.texture.width, self.texture.height)
+
+
+# RenderEngines also need to tell UI Panels that they are compatible with.
+# We recommend to enable all panels marked as BLENDER_RENDER, and then
+# exclude any panels that are replaced by custom panels registered by the
+# render engine, or that are not supported.
+def get_panels():
+    exclude_panels = {
+        'VIEWLAYER_PT_filter',
+        'VIEWLAYER_PT_layer_passes',
+    }
+
+    panels = []
+    for panel in bpy.types.Panel.__subclasses__():
+        if hasattr(panel, 'COMPAT_ENGINES') and 'BLENDER_RENDER' in panel.COMPAT_ENGINES:
+            if panel.__name__ not in exclude_panels:
+                panels.append(panel)
+
+    return panels
+
+
+def register():
+    # Register the RenderEngine.
+    bpy.utils.register_class(CustomRenderEngine)
+
+    for panel in get_panels():
+        panel.COMPAT_ENGINES.add('CUSTOM')
+
+
+def unregister():
+    bpy.utils.unregister_class(CustomRenderEngine)
+
+    for panel in get_panels():
+        if 'CUSTOM' in panel.COMPAT_ENGINES:
+            panel.COMPAT_ENGINES.remove('CUSTOM')
+
+
+if __name__ == "__main__":
+    register()
