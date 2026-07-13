@@ -24,8 +24,8 @@ def main():
     )
 
     # 路径配置
-    input_dir = Path(r"E:\WorkSpace\Data\temp\rgb1")   
-    output_dir = Path(r"E:\WorkSpace\Data\temp\mask")
+    input_dir = Path(r"E:\WorkSpace\Data\test_results_unet_sdxl 7-13 2\0236_Kuqa_Grand_Canyon_Xinjiang_DEM_y256_x0_base_0_gen_texture.png")   
+    output_dir = Path(r"E:\WorkSpace\Data\test_results_unet_sdxl 7-13 2")
     output_dir.mkdir(parents=True, exist_ok=True)
 
     image_paths = list(input_dir.glob("*.jpg")) + list(input_dir.glob("*.png"))
