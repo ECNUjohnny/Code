@@ -1,86 +1,83 @@
 import cv2
 import numpy as np
-from skimage import color
+import os
 
-input = r'E:\WorkSpace\Data\test_results_unet_sdxl 7-13 2\0236_Kuqa_Grand_Canyon_Xinjiang_DEM_y256_x0_base_0_gen_texture.png'
-output = r'E:\WorkSpace\Data\test_results_unet_sdxl 7-13 2'
+# ==========================================
+# 超参数配置 (Hyperparameters)
+# 请直接在此处修改你的文件路径和 K 值
+# ==========================================
+INPUT_PATH = r"E:\WorkSpace\Data\test_results_unet_sdxl 7-13 2\0286_Wulong_Karst_Chongqing_China_DEM_y256_x0_base_0_gen_texture.png"     # 输入图片的路径 (确保图片与脚本在同目录，或使用绝对路径)
+OUTPUT_PATH = r"E:\WorkSpace\Data\test_results_unet_sdxl 7-13 2\kmeans.png" # 输出调色板图片的路径
+K_VALUE = 4                          # K-Means 的 K 值 (聚类中心数量，建议设为 3 或 4)
+# ==========================================
 
-def color_distance_blending(image_path, unity_output=f"{output}/unity_splatmap.png", vis_output=f"{output}/visualization_map.jpg"):
-    img = cv2.imread(image_path)
-    if img is None:
-        print("图片读取失败！")
+def extract_dominant_colors(input_path, output_path, k):
+    # 1. 验证文件路径
+    if not os.path.exists(input_path):
+        print(f"错误：找不到输入文件 '{input_path}'，请检查 INPUT_PATH 的设置。")
         return
+
+    # 2. 读取图像 (OpenCV 默认以 BGR 格式读取)
+    image = cv2.imread(input_path)
+    if image is None:
+        print(f"错误：无法读取图像，请检查文件是否损坏或格式是否受支持。")
+        return
+
+    # 3. 数据预处理
+    # K-Means 算法要求输入为 2D 数组 (像素总数 x 通道数) 且数据类型为 float32
+    pixels = image.reshape((-1, 3))
+    pixels = np.float32(pixels)
+
+    # 4. 设置 K-Means 停止标准 (Criteria)
+    # 达到 100 次迭代，或者聚类中心移动距离小于 0.2 时停止
+    criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 100, 0.2)
+    
+    print(f"正在对图像 '{input_path}' 进行 K={k} 的 K-Means 聚类计算...")
+    
+    # 5. 执行 K-Means
+    # flags=cv2.KMEANS_PP_CENTERS 表示使用 K-Means++ 算法初始化中心，能有效避免陷入局部最优
+    _, labels, centers = cv2.kmeans(
+        pixels, 
+        k, 
+        None, 
+        criteria, 
+        10, # 使用不同的初始中心点执行 10 次算法，并返回最佳结果
+        cv2.KMEANS_PP_CENTERS 
+    )
+
+    # 将计算得到的浮点数中心转换回 8 位无符号整数 (0-255)
+    centers = np.uint8(centers)
+
+    # 6. 统计每个聚类的像素数量，并按占比降序排序
+    label_counts = np.bincount(labels.flatten())
+    sorted_indices = np.argsort(label_counts)[::-1]
+    
+    sorted_centers = centers[sorted_indices]
+    sorted_counts = label_counts[sorted_indices]
+    total_pixels = pixels.shape[0]
+
+    # 7. 绘制 K 个中心的调色板图像
+    # 设定调色板的尺寸：高度 150 像素，宽度为 K * 150 像素
+    block_size = 150
+    palette = np.zeros((block_size, block_size * k, 3), dtype=np.uint8)
+
+    print("\n=== 聚类颜色中心结果 (按像素占比排序) ===")
+    for i in range(k):
+        color = sorted_centers[i]
+        percentage = (sorted_counts[i] / total_pixels) * 100
         
-    img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    
-    # 抹平高光和阴影噪声
-    blurred_img = cv2.GaussianBlur(img_rgb, (31, 31), 0)
-    
-    # 定义你的目标地貌色板 (RGB)
-    palette_rgb = np.array([
-        [150,  80,  70],   # 通道 0 (R): 偏红色的岩石
-        [ 80, 100,  60],   # 通道 1 (G): 偏绿色的植被/苔藓
-        [100,  80,  60],   # 通道 2 (B): 褐色的泥土/普通岩石
-        [ 40,  40,  45]    # 通道 3 (A): 暗色缝隙/深色砂石
-    ], dtype=np.uint8)
-
-    lab_img = color.rgb2lab(blurred_img)
-    palette_lab = color.rgb2lab(palette_rgb.reshape(1, 4, 3)).reshape(4, 3)
-
-    h, w, c = lab_img.shape
-    pixels_lab = lab_img.reshape(-1, 3)
-
-    distances = np.linalg.norm(pixels_lab[:, np.newaxis, :] - palette_lab[np.newaxis, :, :], axis=2)
-    labels = np.argmin(distances, axis=1)
-    segmented_img = labels.reshape(h, w)
-
-    channels = []
-    kernel = np.ones((15, 15), np.uint8)
-    color_names = ["偏红岩石", "绿色植被", "褐色泥土", "暗色砂石"]
-    
-    for i in range(4):
-        mask = (segmented_img == i).astype(np.uint8) * 255
+        # 注意：OpenCV 打印出的 color 数组顺序是 [B, G, R]
+        print(f"中心 {i+1}: BGR={color}, 占比: {percentage:.2f}%")
         
-        # 填海造陆去噪点
-        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
-        mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
-        
-        # 边缘羽化
-        soft_mask = cv2.GaussianBlur(mask, (21, 21), 0)
-        channels.append(soft_mask)
-        
-        coverage = np.count_nonzero(mask) / (h * w) * 100
-        print(f"[{color_names[i]}] 提取完成: 覆盖率 {coverage:.2f}%")
+        # 将颜色填充到调色板的对应区块中
+        start_x = i * block_size
+        end_x = (i + 1) * block_size
+        palette[:, start_x:end_x] = color
 
-    # ================= 1. 生成给 Unity 用的数据图 (RGBA) =================
-    # OpenCV 是 BGR 顺序，所以按 B, G, R, A 传入
-    rgba_splatmap = cv2.merge((channels[2], channels[1], channels[0], channels[3]))
-    cv2.imwrite(unity_output, rgba_splatmap)
-    print(f"[给引擎] Unity Splatmap 已保存: {unity_output}")
-    
-    # ================= 2. 生成给你看的可视化图 (RGB) =================
-    # 创建一个纯黑的画布
-    vis_img = np.zeros((h, w, 3), dtype=np.float32)
-    
-    # 为 4 个通道定义极其鲜艳的代表色 (OpenCV 格式: BGR)
-    # 通道0(红) -> 亮红色, 通道1(绿) -> 亮绿色, 通道2(蓝) -> 亮蓝色, 通道3(Alpha) -> 明黄色
-    vis_colors = [
-        [0, 0, 255],     # 红
-        [0, 255, 0],     # 绿
-        [255, 0, 0],     # 蓝
-        [0, 255, 255]    # 黄
-    ]
-    
-    # 根据羽化后的权重，把这 4 种颜色叠加上去
-    for i in range(4):
-        weight = channels[i].astype(np.float32) / 255.0
-        for c_idx in range(3):
-            vis_img[:, :, c_idx] += weight * vis_colors[i][c_idx]
-            
-    # 限制数值范围并保存
-    vis_img = np.clip(vis_img, 0, 255).astype(np.uint8)
-    cv2.imwrite(vis_output, vis_img)
-    print(f"[给你看] 可视化色彩分布图 已保存: {vis_output}")
+    # 8. 保存输出图像
+    cv2.imwrite(output_path, palette)
+    print(f"\n成功！颜色中心调色板已保存至: '{output_path}'")
 
-# 运行代码
-color_distance_blending(input)
+if __name__ == "__main__":
+    # 直接将头部配置的超参数传入函数执行
+    extract_dominant_colors(INPUT_PATH, OUTPUT_PATH, K_VALUE)
