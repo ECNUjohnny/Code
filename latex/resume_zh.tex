@@ -1,0 +1,122 @@
+\documentclass[a4paper]{article}
+\usepackage{ctex} % 引入 ctex 宏包以支持中文
+\usepackage{fullpage}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{textcomp}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\textheight=10in
+\pagestyle{empty}
+\raggedright
+\usepackage[left=0.8in,right=0.8in,bottom=0.8in,top=0.8in]{geometry}
+
+%\renewcommand{\encodingdefault}{cg}
+%\renewcommand{\rmdefault}{lgrcmr}
+
+\def\bull{\vrule height 0.8ex width .7ex depth -.1ex }
+
+% DEFINITIONS FOR RESUME %%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\area} [2] {
+    \vspace*{-9pt}
+    \begin{verse}
+        \textbf{#1}   #2
+    \end{verse}
+}
+
+\newcommand{\lineunder} {
+    \vspace*{-8pt} \\
+    \hspace*{-18pt} \hrulefill \\
+}
+
+\newcommand{\header} [1] {
+    {\hspace*{-18pt}\vspace*{6pt} \textsc{#1}}
+    \vspace*{-6pt} \lineunder
+}
+
+\newcommand{\employer} [3] {
+    { \textbf{#1} (#2)\\ \underline{\textbf{\emph{#3}}}\\  }
+}
+
+\newcommand{\contact} [3] {
+    \vspace*{-10pt}
+    \begin{center}
+        {\Huge \scshape {#1}}\\
+        #2 \\ #3
+    \end{center}
+    \vspace*{-8pt}
+}
+
+\newenvironment{achievements}{
+    \begin{list}
+        {$\bullet$}{\topsep 0pt \itemsep -2pt}}{\vspace*{4pt}
+    \end{list}
+}
+
+\newcommand{\schoolwithcourses} [4] {
+    \textbf{#1} #2 $\bullet$ #3\\
+    #4 \\
+    \vspace*{5pt}
+}
+
+\newcommand{\school} [4] {
+    \textbf{#1} #2 $\bullet$ #3\\
+    #4 \\
+}
+% END RESUME DEFINITIONS %%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+\vspace*{-40pt}
+
+%==== Profile ====%
+\vspace*{-10pt}
+\begin{center}
+	{\Huge \scshape {周君岩 (Zhou Junyan)}}\\
+	中国，上海，华东师范大学 $\cdot$ Acmejohnnylynd@gmail.com $\cdot$ (+86) 18900670760 $\cdot$ ECNUjohnny.github.io\\
+\end{center}
+
+%==== Education ====%
+\header{教育背景}
+\textbf{华东师范大学}\hfill 中国，上海\\
+计算机科学 本科 \textit{GPA: 3.82 (当前)} \hfill 2024年9月 - 2028年6月 (预计)\\
+\vspace{5mm}
+
+\header{专业技能}
+\begin{tabular}{ l l }
+	编程语言: & C++, Python, HTML, HLSL, JavaScript, Unity Shader Language \\
+	开发工具: & Git, LaTeX, PyTorch \\
+	游戏引擎与图形学: & OpenGL, Unity \\
+    前端开发: & React, npm, JSX, HTML5, jQuery \\
+\end{tabular}
+\vspace{5mm}
+
+\header{项目经历}
+{\textbf{Text-to-Fluid：基于大型语言模型的流体模拟语义创作}} {\sl Unity, Unity Shader Language, C++} \\
+本项目旨在利用大型语言模型分析用户输入的情感，并相应地调整 Unity 渲染的 SPH 流体风格以具象化该情感。\\在 Unity 中实现了一个卡通风格的 SPH 流体渲染器，并集成 LLM，根据用户的自然语言输入动态映射渲染函数与参数。\\
+\vspace*{5mm}
+
+{\textbf{基于文本描述的风格化地形生成}} {\sl Python, PyTorch, CDSE API} \\
+开发了一个基于变分自编码器（VAE）的深度学习框架，用于生成风格化的高度图。集成哥白尼数据空间生态系统（CDSE）API，实现了全球地形数据的自动化获取与处理。\\
+\vspace*{5mm}
+
+\header{科研经历}
+{\textbf{Text-to-Fluid: Semantic Authoring of Fluid Simulation via Large Language Models}} {\sl 计算机辅助设计与计算机图形学国际会议 (CAD/Graphics)} \\
+Xubin Du, Juanjie Luo, Changbo Wang, Chenhui Li, Junyan Zhou, Nan Xiang
+\vspace*{5mm}
+
+\header{荣誉奖项}
+\textbf{蓝桥杯全国软件和信息技术专业人才大赛} \hfill 工业和信息化部\\
+上海赛区一等奖 \hfill 2026年4月\\
+\vspace*{5mm}
+
+\textbf{蓝桥杯全国软件和信息技术专业人才大赛} \hfill 工业和信息化部\\
+全国总决赛三等奖 \hfill 2026年6月\\
+\vspace*{5mm}
+
+\textbf{全国大学生数学竞赛} \hfill 中国数学会\\
+上海赛区一等奖 \hfill 2025年12月\\
+\vspace*{5mm}
+
+\ 
+\end{document}
