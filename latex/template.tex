@@ -1,0 +1,37 @@
+\documentclass[a4paper, 12pt]{article}
+
+\begin{document}
+    \title{My First Doc}
+    \author{Author}    
+    \date{\today}
+    \maketitle
+
+    \section{Introduction}
+    This is a Introduction
+
+    \begin{enumerate}
+        \item First
+        
+        \item Second
+            \begin{itemize}
+                \item A
+                
+                \item B
+            \end{itemize}
+    \end{enumerate}
+
+    \section{Methods}
+
+    \subsection{Stage 1}
+    \label{sec1}  
+    This is stage 1
+
+    \subsection{Stage 2}
+    This is stage 2
+
+    \[ \sum_{i=1}^{n}y_i + z_i + x_i \]
+
+    \section{Results}
+    This is results. Referring to section \ref{sec1} on page \pageref{sec1} 
+
+\end{document}
