@@ -1,7 +1,7 @@
 from PIL import Image
 
-INPUT = r'D:\WorkSpace\Project\llm paper\figures\Ice Mountain\4.png'
-OUTPUT = r'D:\WorkSpace\Project\llm paper\figures\Yardang\1.png'
+INPUT = r'D:\Temp\Photos for Essay\Yardang\Image Sequence_169_21h52m.png'
+OUTPUT = r'D:\Temp\Photos for Essay\Yardang\Image Sequence_169_21h52m.png'
 
 def add_white_background(input_path, output_path):
     # 打开图片
