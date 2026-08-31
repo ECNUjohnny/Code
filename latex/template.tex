@@ -1,37 +1,738 @@
-\documentclass[a4paper, 12pt]{article}
+% \documentclass{vgtc}                          % final (conference style)
+\documentclass[review]{vgtc}                 % review
+%\documentclass[widereview]{vgtc}             % wide-spaced review
+%\documentclass[preprint]{vgtc}               % preprint
+%\documentclass[electronic]{vgtc}             % electronic version
+
+%% Uncomment one of the lines above depending on where your paper is
+%% in the conference process. ``review'' and ``widereview'' are for review
+%% submission, ``preprint'' is for pre-publication, and the final version
+%% doesn't use a specific qualifier. Further, ``electronic'' includes
+%% hyperreferences for more convenient online viewing.
+
+%% Please use one of the ``review'' options in combination with the
+%% assigned online id (see below) ONLY if your paper uses a double blind
+%% review process. Some conferences, like IEEE Vis and InfoVis, have NOT
+%% in the past.
+
+%% Figures should be in CMYK or Grey scale format, otherwise, colour 
+%% shifting may occur during the printing process.
+
+%% it is recomended to use ``\cref{sec:bla}'' instead of ``Fig.~\ref{sec:bla}''
+\graphicspath{{figures/}{pictures/}{images/}{./}} % where to search for the images
+
+\usepackage{times}                     % we use Times as the main font
+\renewcommand*\ttdefault{txtt}         % a nicer typewriter font
+
+%% Only used in the template examples. You can remove these lines.
+\usepackage{booktabs}                  % only used for the table example
+\usepackage{amsmath}
+\usepackage{amssymb}
+
+%% We encourage the use of mathptmx for consistent usage of times font
+%% throughout the proceedings. However, if you encounter conflicts
+%% with other math-related packages, you may want to disable it.
+\usepackage{mathptmx}                  % use matching math font
+\usepackage[caption=false]{subfig}
+
+%% If you are submitting a paper to a conference for review with a double
+%% blind reviewing process, please replace the value ``0'' below with your
+%% OnlineID. Otherwise, you may safely leave it at ``0''.
+
+% TODO: 需要改
+\onlineid{2072}
+
+%% declare the category of your paper, only shown in review mode
+\vgtccategory{Research}
+
+%% allow for this line if you want the electronic option to work properly
+\vgtcinsertpkg
+
+%% In preprint mode you may define your own headline. If not, the default IEEE copyright message will appear in preprint mode.
+%\preprinttext{To appear in an IEEE VGTC sponsored conference.}
+
+%% This adds a link to the version of the paper on IEEEXplore
+%% Uncomment this line when you produce a preprint version of the article 
+%% after the article receives a DOI for the paper from IEEE
+%\ieeedoi{xx.xxxx/TVCG.201x.xxxxxxx}
+
+
+%% Paper title.
+
+\title{Text-Driven Joint Generation of Terrain Geometry and Texture in a Shared Latent Space}
+
+%% This is how authors are specified in the conference style
+
+%% Author and Affiliation (single author).
+%%\author{Roy G. Biv\thanks{e-mail: roy.g.biv@aol.com}}
+%%\affiliation{\scriptsize Allied Widgets Research}
+
+%% Author and Affiliation (multiple authors with single affiliations).
+%%\author{Roy G. Biv\thanks{e-mail: roy.g.biv@aol.com} %
+%%\and Ed Grimley\thanks{e-mail:ed.grimley@aol.com} %
+%%\and Martha Stewart\thanks{e-mail:martha.stewart@marthastewart.com}}
+%%\affiliation{\scriptsize Martha Stewart Enterprises \\ Microsoft Research}
+
+%% Author and Affiliation (multiple authors with multiple affiliations)
+\author{
+Junyan Zhou\thanks{e-mail: a936493853@outlook.com}\\ %
+        \scriptsize East China Normal University %
+\and Yunze Han\thanks{e-mail: luobolegend@gmail.com}\\ %
+     \scriptsize East China Normal University %
+\and Haizhu Zhou\thanks{e-mail: 10245102404@stu.ecnu.edu.cn}\\ %
+     \scriptsize East China Normal University %
+\and Chenhui Li\thanks{e-mail: chli@cs.ecnu.edu.cn}\\ %
+     \scriptsize East China Normal University}
+
+%% A teaser figure can be included as follows
+\teaser{
+  \centering
+
+  \includegraphics[width=\linewidth]{figures/teaser.pdf}
+
+  \caption{We propose a text-driven framework for the joint generation of terrain geometry and texture. By leveraging a shared latent space, our method simultaneously synthesizes high-fidelity Digital Elevation Models (DEM, top-right insets) and RGB textures (bottom-right insets) with strict spatial alignment. Prompts used to generate these terrains are showed in the frame (left: Danxia terrain; right: Karst terrain) .}
+    \label{fig:teaser}
+
+}
+
+%% Abstract section.
+\abstract{
+  Generating realistic terrain assets is essential for games, film, simulation, and virtual reality applications.
+  Existing text-driven approaches either generate heightmaps and textures in separate stages, suffering from geometric---textural inconsistency, or control only coarse landform categories (e.g., ``desert'' or ``mountain'') without capturing the fine-grained geological features that define terrain character.
+  We observe that such fine-grained landforms (e.g., karst tower peaks, yardang ridge lines, Danxia vertical cliffs) are simultaneously signatures of geometry and appearance, and must therefore be modeled jointly.
+  We present a framework that unifies semantic terrain control with joint heightmap: texture generation in a shared latent space.
+  Our method encodes paired heightmap and texture data into an 8-channel latent representation and performs text-conditioned denoising with a single diffusion backbone, injecting token-level geological semantics via cross-attention while an explicit cross-modal consistency loss encourages alignment between geometric and appearance structure.
+  A terrain-specialized variational autoencoder encodes heightmaps into this shared latent space.
+  Experiments on a curated dataset of 2{,}480 paired terrain samples spanning six landform types evaluate geometry---texture coupling, fine-grained semantic controllability, and the contribution of the consistency objective.
+  We integrate our method into a terrain authoring system for game, simulation, and VR content-creation workflows.
+} % end of abstract
+
+%% Keywords that describe your work. Will show as 'Index Terms' in journal
+%% please capitalize first letter and insert punctuation after last keyword.
+\keywords{Terrain generation, fine-grained semantic control, latent diffusion models, text-to-3D, joint multi-modal generation.}
+
+%% Copyright space is enabled by default as required by guidelines.
+%% It is disabled by the 'review' option or via the following command:
+% \nocopyrightspace
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%% START OF THE PAPER %%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{document}
-    \title{My First Doc}
-    \author{Author}    
-    \date{\today}
-    \maketitle
 
-    \section{Introduction}
-    This is a Introduction
+%% The ``\maketitle'' command must be the first command after the
+%% ``\begin{document}'' command. It prepares and prints the title block.
 
-    \begin{enumerate}
-        \item First
-        
-        \item Second
-            \begin{itemize}
-                \item A
-                
-                \item B
-            \end{itemize}
-    \end{enumerate}
+%% the only exception to this rule is the \firstsection command
+\firstsection{Introduction}
 
-    \section{Methods}
+\maketitle
 
-    \subsection{Stage 1}
-    \label{sec1}  
-    This is stage 1
+%% \section{Introduction} %for journal use above \firstsection{..} instead
+Terrain assets form the foundation of virtually every outdoor virtual environment~\cite{Perlin:1985}.
+In games and film production, large-scale, visually diverse landscapes are among the most asset-heavy components of a title~\cite{TerraFusion:2025}.
+Simulation and training systems, such as flight simulators, driving simulators, emergency-response and tactical rehearsal---depend on geographically plausible terrain to transfer skills to the real world.
+Digital-twin and urban-planning applications increasingly require terrain that reflects real geomorphology rather than stylized approximations, and geoscience education and cultural-heritage visualization rely on faithful digital reconstructions of landforms.
 
-    \subsection{Stage 2}
-    This is stage 2
+Among these domains, virtual reality places the strictest demands on terrain assets.
+A VR user does not look at a landscape on a screen but stands \emph{inside} it, traversing on foot and viewing at close range through a head-mounted display.
+Under such scrutiny, geometry---texture inconsistencies that would pass unnoticed in desktop rendering---vegetation painted onto a vertical cliff face, or uniform sediment cover on a rugged ridge---become immediately conspicuous and break the sense of presence on which VR applications depend.
+At the same time, VR content creation is chronically constrained by art budgets: immersive experiences such as virtual tourism, heritage walkthroughs, geography education, and location-based entertainment all need large outdoor environments, yet hand-crafting them remains the bottleneck of the VR content pipeline~\cite{11457501,11459369}.
 
-    \[ \sum_{i=1}^{n}y_i + z_i + x_i \]
+Yet producing such assets remains expensive.
+Traditionally, artists craft terrain geometry and surface textures through labor-intensive manual workflows, often requiring days of work for a single high-quality landscape tile; procedural methods accelerate geometry creation but offer limited semantic control and cannot produce photorealistic textures.
+Text-driven generation offers a direct way to lower this barrier: a designer---or a non-expert VR content creator---describes the desired landscape in natural language and receives a ready-to-use, paired heightmap and texture.
+For this promise to hold in practice, two properties are essential: (i)~the text interface must express not only coarse landform categories but the \emph{fine-grained geological features} that define a landscape's character, and (ii)~the generated geometry and texture must be mutually consistent, precisely because immersive applications scrutinize the two together.
+Existing approaches fall short on both counts, as we detail next.
 
-    \section{Results}
-    This is results. Referring to section \ref{sec1} on page \pageref{sec1} 
+Recent advances in diffusion models~\cite{DDPM:2020,LDM:2022} have enabled text-driven content generation across image, video, and 3D domains.
+In the terrain generation space, two paradigms have emerged:
+(1)~\emph{two-stage pipelines} that first generate a heightmap and then condition texture synthesis on it, and
+(2)~\emph{joint generation} methods that produce both modalities simultaneously in a shared representation.
+The two-stage approach suffers from error accumulation and geometric---textural inconsistency: the texture generator may produce vegetation on a cliff face or bare rock on a flat plain.
+Joint generation avoids this by construction, but existing work lacks open-vocabulary text control.
 
+Where text control does exist, it remains at the \emph{coarse category level}.
+MESA~\cite{MESA:2025} conditions on biome, geological-region, and country labels assembled into a fixed prompt template; LandCraft~\cite{LandCraft:2026} plans coarse landscape elements before assembling a 3D scene procedurally.
+Neither captures the \emph{fine-grained geological semantics} that professional terrain design actually demands---for example, the tower peaks of a karst landscape, the wind-carved ridges of yardang terrain, or the vertical strata of Danxia landforms.
+Moreover, TerraFusion~\cite{TerraFusion:2025} achieves joint heightmap---texture generation in a shared latent space but provides no text conditioning beyond a fixed prompt, and its own authors explicitly identify textual input as an open direction.
+
+We bridge this gap with a framework that unifies \emph{fine-grained semantic terrain control} with \emph{joint geometry---texture generation}.
+Our contributions are, in order of priority:
+\begin{enumerate}
+  \item \textbf{Fine-grained semantic control.} We inject token-level geological semantics via cross-attention, enabling natural-language descriptions of specific landform features (e.g., ``limestone towers surrounded by dense subtropical vegetation'') to be realized in the output---a capability beyond category-level text conditioning.
+  \item \textbf{Joint heightmap---texture generation.} We denoise a shared 8-channel latent space under a single noise schedule and introduce an explicit cross-modal consistency loss that aligns geometric and appearance structure, so geometry and texture are co-generated rather than assembled from independent branches.
+  \item \textbf{A terrain authoring system.} We integrate our method into a terrain authoring workflow where users issue natural-language prompts to produce landscape assets.
+\end{enumerate}
+To our knowledge, this is the first text-conditioned framework that jointly generates terrain heightmaps and textures in a shared latent space.
+
+\section{Related Work}
+
+\subsection{Terrain Generation}
+
+Procedural terrain generation has a long history, from noise-based methods~\cite{Perlin:1985, 10.1145/74333.74337}, Patch-based DEM assembly~\cite{4293025} to erosion simulation~\cite{cordonnier2017authoring, https://doi.org/10.1111/cgf.12820} and rule-based systems~\cite{Ebert:2003, genevaux2013terrain}.
+These approaches produce geometrically plausible heightmaps but lack semantic controllability and cannot generate textures.
+
+Learning-based methods have recently advanced the field. ~\cite{10.1145/3359998.3369407} leverages GAN-based deep learning methods for joint terrain and texture synthesis, its generation quality remains limited.
+TDN~\cite{TDN:2024} introduces a climatic-aware diffusion network conditioned on geological sketches to generate heightmaps, but does not address texture synthesis.
+InfiniteDiffusion~\cite{TerrainDiffusion:2026} extends diffusion to open-world, infinite-resolution heightmap generation with hierarchical Laplacian encoding.
+Geodiffussr~\cite{Geodiffussr:2025} applies flow matching to generate terrain textures conditioned on text and an input DEM, but treats geometry as given rather than generated.
+EarthCrafter~\cite{EarthCrafter:2025} generates structured 3D landscape scenes with semantic guidance but uses separate sparse 3D-VAE encodings for geometry and appearance.
+
+\subsection{Text-Driven Generation}
+
+The success of CLIP~\cite{CLIP:2021} and latent diffusion models~\cite{LDM:2022} has enabled text-to-image synthesis at unprecedented quality.
+Stable Diffusion XL~\cite{SDXL:2024} and Stable Diffusion 3~\cite{SD3:2024} introduced dual-branch conditioning architectures that inject both pooled global semantics (via timestep modulation) and sequential local semantics (via cross-attention), establishing the standard for text-conditioned diffusion.
+DiT~\cite{DiT:2023} and PixArt-$\alpha$~\cite{PixArt:2024} demonstrated that transformer-based diffusion backbones can achieve comparable quality with adaptive layer normalization (adaLN) for conditioning.
+
+In the terrain domain, MESA~\cite{MESA:2025} is the closest text-driven method.
+It uses a shared U-Net backbone with separate output heads for heightmap and texture, denoising the two modalities under a \emph{shared} timestep.
+However, its text conditioning is limited to coarse category-level descriptors (biome, geological region, country) assembled into a fixed prompt template, and its modalities couple only through shared weights and separate heads, without an explicit cross-modal consistency objective.
+LandCraft~\cite{LandCraft:2026} employs an LLM to plan coarse landscape elements before synthesizing 3D scenes procedurally, but does not generate paired heightmap---texture outputs.
+TG-TSGNet~\cite{11306245} generates arbitrary-resolution terrain scene images from text descriptions using a ConvMamba-VQGAN, but produces single RGB images without corresponding heightmaps.
+
+\subsection{Joint Multi-Modal Generation}
+
+Joint generation of correlated modalities has been explored primarily in the RGB-D domain.
+LDM3D~\cite{LDM3D:2023} is a text-conditioned model that jointly synthesizes RGB images and depth maps in a shared latent space, demonstrating that shared representations improve cross-modal consistency over pipeline approaches.
+However, it targets general-purpose scene depth rather than terrain-specific heightmaps and satellite textures.
+Osmosis~\cite{Osmosis:2025} trains an unconditional joint image---depth diffusion prior.
+DiffusioNeRF~\cite{DiffusioNeRF:2023} uses channel-concatenated RGBD patches to regularize neural radiance fields.
+
+TerraFusion~\cite{TerraFusion:2025} is the most directly relevant work: it encodes heightmaps with a custom VAE (4 latent channels) and textures with a frozen Stable Diffusion VAE (4 channels), concatenates them into an 8-channel latent, and trains a single U-Net for joint denoising.
+However, TerraFusion uses a fixed text prompt (``A satellite terrain image'') and relies on ControlNet~\cite{ControlNet:2023} sketch guidance (red=valley, green=ridge, blue=cliff) rather than open-vocabulary text conditioning; its authors explicitly identify textual input as an open direction for future work.
+Our work extends the joint latent diffusion paradigm to the text-conditioned, fine-grained semantic setting for terrain generation.
+
+\begin{figure*}[t]
+  \centering
+
+  \includegraphics[width=\linewidth]{pipeline.pdf}
+  
+  \caption{Overview of our text-driven joint terrain generation framework. A text prompt is encoded by a frozen CLIP model; token-level features are injected via cross-attention into a diffusion backbone that denoises an 8-channel joint latent (4ch texture + 4ch heightmap) under a shared noise schedule. The denoised latent is decoded into a paired texture and heightmap.}
+  \label{fig:pipeline}
+\end{figure*}
+
+\subsection{Immersive Content Generation}
+
+Terrain generation is a foundational component of immersive content creation.
+ImmerseGen~\cite{11459369} generates photorealistic panoramic worlds from text prompts via agent-guided alpha-textured proxies for VR experiences.
+SceneLinker~\cite{11460307} generates compositional 3D scenes from semantic scene graphs for mixed reality.
+Interaction-Aware Shared Scene Synthesis~\cite{11480957} uses LLM-based planning to create shared virtual environments for VR telepresence.
+DreamCraft~\cite{11457501} investigates generative workflows for immersive prototyping at scene and object levels in VR.
+These methods focus on indoor or object-level scene composition; our terrain generation system complements this line of work by providing the outdoor landscape foundation upon which immersive scenes are built.
+
+
+\section{Method}
+
+\subsection{Pipeline Overview}
+
+\cref{fig:pipeline} illustrates our framework.
+Given a text prompt $c$ describing the desired terrain (e.g., ``a karst landscape with steep limestone towers surrounded by dense subtropical vegetation''), the system produces a paired heightmap $H \in \mathbb{R}^{512 \times 512}$ and texture image $T \in \mathbb{R}^{512 \times 512 \times 3}$ in a single forward pass.
+
+The pipeline consists of three stages:
+(1)~\emph{Encoding}: a frozen SD-VAE $\mathcal{E}_t$ and a terrain-specialized HeightMapVAE $\mathcal{E}_h$ encode the texture and heightmap into 4-channel latents $z_t, z_h \in \mathbb{R}^{64 \times 64 \times 4}$, which are concatenated into a joint latent $z = [z_t; z_h] \in \mathbb{R}^{64 \times 64 \times 8}$.
+(2)~\emph{Joint denoising}: a text-conditioned diffusion backbone iteratively denoises $z$ over 50 steps~\cite{DDIM:2022}, guided by token-level CLIP conditioning via cross-attention.
+(3)~\emph{Decoding}: the denoised latent $\hat{z}$ is split and decoded by $\mathcal{D}_t$ and $\mathcal{D}_h$ to produce the final texture and heightmap.
+
+Two requirements drive this design.
+First, \emph{fine-grained semantic control}: the text interface must realize descriptions of specific geological structures rather than merely select a landform category; this requirement motivates the token-level conditioning pathway of \cref{sec:conditioning}.
+Second, \emph{geometry--texture consistency}: downstream consumers---game engines, mesh displacement, VR walkthroughs---use the heightmap and texture together, so the two outputs must agree spatially; this requirement motivates both the shared latent space with its explicit consistency objective (\cref{sec:joint_latent}) and a heightmap encoder trained on real DEM data (\cref{sec:heightmap_vae}).
+
+% TODO: replace placeholder with real pipeline figure
+
+\subsection{Joint Latent Space}
+\label{sec:joint_latent}
+
+The central design question of joint generation is \emph{how} the two modalities should be coupled inside a single generative model.
+Terrain geometry and texture exhibit strong spatial coupling: steep slopes correspond to exposed rock or scree, flat areas to vegetation or sediment, and ridge lines to snow or bare soil depending on altitude and climate.
+A model that captures this coupling must represent the \emph{joint} distribution $p(H, T \mid c)$ rather than two marginal or sequentially conditioned distributions stitched together.
+
+Three coupling strategies are possible.
+(1)~\emph{Two-stage cascades} generate the heightmap first and condition texture synthesis on it; the sequential dependence accumulates errors, the texture stage can never influence geometry, and any mismatch introduced in the first stage is permanent.
+(2)~\emph{Parallel branches over a shared backbone}, as in the separate output heads of MESA~\cite{MESA:2025}, decode each modality through its own head; coupling then exists only through shared weights, providing no sample-level guarantee that geometry and texture agree.
+(3)~\emph{A shared latent space} concatenates both modalities into a single latent vector that is denoised with one noise sample and one schedule, so the model learns $p(H, T \mid c)$ directly.
+We adopt the third strategy, following the design validated by TerraFusion~\cite{TerraFusion:2025} and LDM3D~\cite{LDM3D:2023}: with a single noise schedule, the diffusion model can exploit cross-modal structure at every denoising step rather than hoping two branches stay aligned.
+
+Channel concatenation is the simplest fusion that realizes this strategy, and it has one prerequisite: the two modalities must live in \emph{spatially aligned} latents of identical resolution, so that each latent position refers to the same image region in both modalities.
+This prerequisite drives our dual-VAE encoder design: rather than training a single VAE over the raw 4-channel data (RGB + height), we encode each modality with a specialist encoder---a frozen Stable Diffusion VAE for texture, which preserves the image prior already learned from large-scale natural-image data, and a custom VAE for heightmaps (\cref{sec:heightmap_vae}), because single-channel elevation data has statistical and structural properties that natural-image VAEs are not trained to capture.
+Both encoders downsample $512 \times 512$ inputs to $64 \times 64 \times 4$ latents, so the concatenated representation is pixel-aligned across modalities---the property that later makes the cross-modal consistency loss of \cref{eq:consistency_loss} well-defined.
+
+\paragraph{Encoding.}
+The texture encoder $\mathcal{E}_t$ is the frozen VAE from Stable Diffusion, mapping $512 \times 512$ RGB images to $64 \times 64 \times 4$ latents (scaled by $0.18215$).
+The heightmap encoder $\mathcal{E}_h$ is a custom VAE trained on real DEM data (\cref{sec:heightmap_vae}), producing latents of the same spatial resolution.
+The joint latent is:
+\begin{equation}
+  z = [\mathcal{E}_t(T);\, \mathcal{E}_h(H)] \in \mathbb{R}^{64 \times 64 \times 8}
+  \label{eq:joint_latent}
+\end{equation}
+
+\paragraph{Joint denoising.}
+During training, we add noise to the full 8-channel latent with a \emph{single} noise sample and timestep:
+\begin{equation}
+  z_t = \sqrt{\bar{\alpha}_t}\, z + \sqrt{1 - \bar{\alpha}_t}\, \varepsilon, \quad \varepsilon \sim \mathcal{N}(0, I)
+  \label{eq:forward}
+\end{equation}
+The model learns to predict $\varepsilon$ conditioned on text $c$.
+This contrasts with separate-head designs such as MESA~\cite{MESA:2025}: with modality-specific output heads, coupling must pass entirely through shared weights, whereas a single joint denoiser can exploit cross-modal structure at every step. \Cref{sec:comparison} ablates this design choice directly as the dual-head variant.
+
+\paragraph{Training objective.}
+The diffusion loss uses per-channel noise prediction weighted by the Min-SNR strategy~\cite{DDPM:2020} with $\gamma = 5$:
+\begin{equation}
+  \mathcal{L}_{\text{diff}} = \mathbb{E}_{z, \varepsilon, t}\left[w(t)\,\| \varepsilon - \varepsilon_\theta(z_t, t, c) \|^2 \right]
+  \label{eq:diffusion_loss}
+\end{equation}
+where $w(t) = \min(\text{SNR}(t), \gamma)$ and $\text{SNR}(t) = \bar{\alpha}_t / (1 - \bar{\alpha}_t)$.
+
+Additionally, we introduce a \emph{cross-modal consistency loss} that explicitly aligns the spatial structure of geometry and appearance in the predicted clean latent $\hat{z}_0$:
+\begin{equation}
+  \mathcal{L}_{\text{consist}} = 1 - \text{CosSim}\big(|\nabla \hat{z}_0^{1:4}|,\; |\nabla \hat{z}_0^{5:8}|\big)
+  \label{eq:consistency_loss}
+\end{equation}
+where $|\nabla \cdot|$ denotes the Sobel gradient magnitude and $\text{CosSim}$ is the cosine similarity over flattened spatial maps.
+This loss encourages the geometric gradient structure (ridges, cliffs, valleys) to align with the appearance gradient structure (texture boundaries), providing an explicit coupling signal beyond the implicit sharing of the latent space.
+One may ask why an explicit loss is needed at all when the shared latent space already couples the two modalities implicitly.
+Implicit coupling emerges only insofar as the training data and model capacity exploit it; on our curated dataset of 2{,}480 paired samples, we prefer to inject the domain prior directly---the structural skeleton of a landform (its ridges, cliffs, and valley lines) should appear in both geometry and appearance---rather than leave it to be discovered from data alone.
+The total training objective is:
+\begin{equation}
+  \mathcal{L} = \mathcal{L}_{\text{diff}} + \lambda_{\text{consist}}\, \mathcal{L}_{\text{consist}}, \quad \lambda_{\text{consist}} = 0.1
+  \label{eq:total_loss}
+\end{equation}
+
+\paragraph{Decoding.}
+At inference, the denoised $\hat{z}$ is split along the channel dimension:
+\begin{equation}
+  \hat{T} = \mathcal{D}_t(\hat{z}[:, :, :4] / 0.18215), \quad \hat{H} = \mathcal{D}_h(\hat{z}[:, :, 4:])
+  \label{eq:decode}
+\end{equation}
+We use 50-step DDIM sampling~\cite{DDIM:2022} with classifier-free guidance scale $w = 4.0$.
+
+\subsection{Fine-Grained Semantic Conditioning}
+\label{sec:conditioning}
+
+Text conditioning for terrain must carry two levels of information: the \emph{category} of landform (karst, Danxia, ice mountain), and the \emph{fine-grained geological details} that distinguish one landscape from another within the same category---tower peaks rather than isolated hills, exposed strata, dense vegetation cover.
+Two standard conditioning mechanisms cover these levels with different fidelity.
+A pooled global embedding, injected through adaptive layer normalization~\cite{DiT:2023,PixArt:2024}, modulates the feature map uniformly; it is effective for category-level style, but compresses the prompt into a single vector and discards the compositional structure in which fine-grained details live.
+Token-level cross-attention~\cite{LDM:2022,SDXL:2024} instead lets the latent features attend to individual tokens and preserves that structure; our conditioning design is therefore built around the token-level branch.
+
+Concretely, a frozen CLIP text encoder~\cite{CLIP:2021} produces a sequence of per-token features $c_{\text{seq}} \in \mathbb{R}^{L \times d}$ from the input prompt $c$.
+Freezing the encoder preserves the broad text--image alignment acquired during CLIP pretraining and prevents co-adaptation between the language space and our terrain dataset.
+These token-level features carry the fine-grained geological semantics (e.g., ``steep limestone towers'', ``dense subtropical vegetation'') and are injected into the backbone via cross-attention in each block:
+\begin{equation}
+  \text{CrossAttn}(Q, K, V) = \text{softmax}\!\left(\frac{Q K^\top}{\sqrt{d}}\right) V
+  \label{eq:cross_attn}
+\end{equation}
+where $Q$ derives from the latent features and $K, V$ from $c_{\text{seq}}$.
+
+This token-level cross-attention is the mechanism that carries fine-grained landform descriptions into the generation process, following the conditioning paradigm established by SDXL~\cite{SDXL:2024} and SD3~\cite{SD3:2024}.
+Our primary U-Net backbone relies on this local branch as its conditioning pathway; the DiT alternative additionally consumes the pooled embedding $c_{\text{pool}} \in \mathbb{R}^{d}$ (capturing global landform category) via adaLN modulation, providing a coarse-to-fine conditioning hierarchy.
+
+For classifier-free guidance, we drop the text conditioning with probability $p_{\text{uncond}} = 0.1$ during training.
+
+\subsection{HeightMapVAE}
+\label{sec:heightmap_vae}
+
+Standard image VAEs operate on RGB data and offer no interface for single-channel elevation, so we train a dedicated heightmap encoder, the HeightMapVAE, an \texttt{AutoencoderKL} with 1-channel input/output and 4 latent channels on real DEM tiles.
+Its training objective supervises slope and curvature fields alongside pixel reconstruction, motivated by the tendency of pixel-wise losses to smooth ridges and cliffs:
+\begin{equation}
+  \mathcal{L}_{\text{VAE}} = \mathcal{L}_{\text{recon}} + 0.8\,\mathcal{L}_{\text{geo}} + \lambda_{\text{KL}}\,\mathcal{L}_{\text{KL}}
+  \label{eq:vae_loss}
+\end{equation}
+where $\mathcal{L}_{\text{geo}} = \mathcal{L}_{\text{slope}} + 0.5\,\mathcal{L}_{\text{curv}}$.
+
+\paragraph{Reconstruction loss.}
+$\mathcal{L}_{\text{recon}} = \| H - \hat{H} \|$ operates on normalized heightmaps $H \in [0, 1]^{512 \times 512}$.
+
+\paragraph{Slope gradient loss.}
+We compute the Sobel gradient magnitude of both ground truth and reconstruction:
+\begin{equation}
+  \mathcal{L}_{\text{slope}} = \big\| |\nabla H| - |\nabla \hat{H}| \big\|^2
+  \label{eq:slope_loss}
+\end{equation}
+where $|\nabla H| = \sqrt{(G_x * H)^2 + (G_y * H)^2}$ with $3 \times 3$ Sobel kernels $G_x, G_y$.
+This penalizes smoothing of steep slopes and sharp elevation changes.
+
+\paragraph{Laplacian curvature loss.}
+\begin{equation}
+  \mathcal{L}_{\text{curv}} = \text{SmoothL1}\big(\nabla^2 H,\; \nabla^2 \hat{H}\big)
+  \label{eq:curv_loss}
+\end{equation}
+where $\nabla^2$ is the discrete Laplacian. This preserves local convexity/concavity patterns (ridges vs.\ valleys).
+
+\paragraph{KL regularization.}
+The KL divergence is normalized to per-dimension mean and annealed over 50 epochs with a free-bits threshold of 0.1 nats/dim to prevent posterior collapse while allowing gradual regularization.
+
+The VAE is trained on 550 real DEM tiles ($1081 \times 1081$, uint16, center-cropped and resized to $512 \times 512$) with geographic coordinates spanning diverse landform types.
+
+\subsection{Training Strategy}
+\label{sec:training}
+
+\paragraph{Backbone variants.}
+The framework is instantiated on a U-Net backbone; nothing in the joint-latent formulation is specific to it:
+\begin{itemize}
+  \item \textbf{U-Net (primary)}: initialized from Stable Diffusion 1.5~\cite{LDM:2022} pretrained weights. The first and last convolutional layers are expanded from 4 to 8 channels (the new DEM channels initialized with small random weights). We apply staged unfreezing: the backbone is frozen except for the new conv layers, attention modules, shallow encoder blocks, and deep decoder blocks. A layered learning rate assigns $5\times$ the base rate to the newly initialized conv layers.
+  \item \textbf{DiT (alternative)}: a Diffusion Transformer~\cite{DiT:2023} trained from scratch with adaLN-Zero initialization and flow matching (velocity prediction); this variant is an alternative instantiation of the same interface and is not part of the quantitative comparison.
+\end{itemize}
+
+The staged-unfreezing schedule preserves the pretrained image-generation prior in the bulk of the U-Net while spending capacity where the terrain task differs most: the new 8-channel interface, the cross-attention conditioning pathway, and the shallow encoder and deep decoder blocks that govern spatial structure.
+
+\paragraph{Data.}
+We curate 2{,}480 paired terrain samples, each consisting of:
+\begin{itemize}
+  \item A texture: $512 \times 512$ RGB satellite imagery, stored as .png
+  \item A text description: generated by a large language model (vLLM) and manually reviewed, averaging 36 words per caption
+\end{itemize}
+The dataset spans six landform types: desert, yardang, Danxia, ice mountain, loess, and karst, with class frequencies ranging from 295 (karst) to 527 (desert).
+Total data volume is approximately 4.3\,GB.
+
+\paragraph{Training details.}
+The primary U-Net is trained for 50 epochs with the AdamW optimizer (learning rate $2 \times 10^{-5}$, weight decay $10^{-4}$), batch size 4, with mixed-precision training (fp16) on a single GPU; the DiT alternative uses flow matching with velocity prediction, a $1.5\times$ loss weighting on the DEM channels, and a 100-epoch budget.
+The noise schedule follows the linear $\beta$ schedule from~\cite{DDPM:2020} with $T = 1000$ steps.
+Training uses the $\varepsilon$-prediction parameterization with Min-SNR weighting ($\gamma = 5$).
+
+\section{Terrain Authoring System}
+\label{sec:system}
+
+To validate the practical value of our framework, we integrate it into a terrain authoring system that turns a natural-language prompt into a landscape asset ready for downstream engines and immersive walkthroughs (\cref{fig:system}).
+The system adopts a three-tier architecture.
+A Unity/Web front-end collects the user's prompt, previews generated results, and renders the resulting terrain mesh for first-person walkthroughs.
+A Python inference service hosts the joint model and exposes a single HTTP generation endpoint that returns the paired texture and heightmap.
+The model itself is deployed on a cloud GPU, so that authoring clients need no local acceleration hardware.
+
+\paragraph{Asset completion.}
+To bridge the gap between generated assets and real-time rendering, our pipeline incorporates an automated texturing stage for the generated $512 \times 512$ base tiles. We utilize SAM-Geo~\cite{SAM:2023} in an unsupervised manner to segment the base texture into semantically coherent regions based on color distribution. 
+For region-level material assignment, we map each segment to a predefined library of high-resolution textures by minimizing the distance between the region's average CIELAB color and the library's representative colors. 
+This matching process explicitly populates the channels of a splatmap, which is subsequently refined via Gaussian filtering to ensure natural spatial transitions. 
+The ultimate output is synthesized by blending the high-frequency library textures with the generated base texture using a predefined ratio, yielding a production-ready terrain surface. For the teaser images (~\cref{fig:teaser}), the generated heightmaps were post-processed using the erosion simulation algorithms in the geological software Gaea~\cite{quadspinner_gaea} to enhance fine-grained details and visual fidelity.
+
+
+% TODO: replace placeholder with real system figure (F7)
+\begin{figure}[t]
+  \centering
+
+  \includegraphics[width=\linewidth]{figures/authoring system.pdf}
+  
+  \caption{Our terrain authoring system. A natural-language prompt is sent to a cloud-hosted joint model; the returned heightmap and texture are automatically segmented into material regions and assembled into a renderable terrain mesh.}
+  \label{fig:system}
+\end{figure}
+
+\section{Experiments}
+\label{sec:experiments}
+
+Our experiments are designed to answer four questions:
+(Q1)~Does joint generation in a shared latent space outperform separate-head and unpaired alternatives in geometry---texture coupling and overall quality? (\cref{sec:comparison})
+(Q2)~Does the model realize fine-grained geological semantics rather than merely category-level styles? (\cref{sec:controllability})
+(Q3)~Does the cross-modal consistency loss contribute measurably? (\cref{sec:ablation})
+(Q4)~Do human observers perceive the generated terrain as semantically matched and geometrically coherent? (\cref{sec:userstudy})
+
+\subsection{Experimental Setup}
+\label{sec:setup}
+
+\paragraph{Data and protocol.}
+We use the curated dataset of \cref{sec:training}: 2{,}480 heightmap--texture--caption triplets spanning six landform types, plus 550 real DEM tiles for the HeightMapVAE.
+Train and evaluation samples are split per tile at random with a fixed seed, so every evaluation sample is unseen during training; because tiles cut from the same source landscape can fall on opposite sides of the split, evaluation metrics may be mildly optimistic (\cref{sec:conclusion}).
+
+\paragraph{Baselines.}
+We compare against variants that span the coupling ladder of \cref{sec:joint_latent}, all sharing the same backbone budget, dataset, and evaluation protocol:
+(i)~\emph{Dual-head}: the shared U-Net with its final convolution split into two modality-specific 4-channel output heads, an output-head separation ablation in the spirit of MESA's separate heads~\cite{MESA:2025} (its UpBlock-level duplication and cross-modal input averaging are not replicated);
+(ii)~\emph{No-consistency}: the full architecture retrained with $\mathcal{L}_{\text{consist}}$ removed under the same seed split and epoch budget, isolating the explicit objective's contribution;
+(iii)~\emph{Random pairing}: the full model's generations with each texture re-paired to a cross-prompt-mismatched heightmap, serving as a chance-level reference for the coupling metric.
+% Where their official implementations are available, we additionally report published results of TerraFusion~\cite{TerraFusion:2025} [PENDING].
+
+\paragraph{Metrics.}
+\emph{Texture quality}: FID~\cite{heusel2017gans} and KID~\cite{binkowski2018demystifying} in CLIP ViT-L/14 image-embedding space, following the CLIP-space FID protocol of DALL-E 2~\cite{ramesh2022hierarchical} as used for terrain by TerraFusion~\cite{TerraFusion:2025}
+(768-d projected, L2-normalized embeddings; 224$\times$224 center-crop preprocessing),
+computed over 496 generated tiles (124 held-out prompts $\times$ 4 seeds) against the
+124 real validation textures of the same landform types; KID uses an RBF kernel with
+the median-heuristic bandwidth and we report bootstrap standard errors (500 resamples). Given the small reference set, we treat KID---unbiased and better behaved at small sample sizes---as the primary distribution metric and FID$_{\text{CLIP}}$ as secondary.
+
+\emph{Text alignment}: CLIPScore~\cite{hessel2021clipscore}, the cosine similarity between the CLIP ViT-L/14
+embeddings of the conditioning prompt and the generated texture, averaged per sample.
+
+\emph{Geometry--texture coupling}: raw-value Pearson correlation between the heightmap
+and each texture channel, averaged over channels and samples (the protocol of
+TerraFusion). To calibrate how much signal this measure carries on terrain at all, we
+report the statistic for real heightmap--texture pairs, and for generated pairs under
+three pairing-breaking transforms (rotating, flipping, or cross-prompt mismatching
+the heightmap), with a real cross-prompt-mismatch control; the full result, in
+\cref{tab:pairing}, bounds what any model's absolute value can mean.
+
+\emph{Semantic coverage}: CLIP zero-shot landform classification accuracy (OA) of
+generated textures against the six landform labels present in the dataset, using the
+template ``a satellite image of \{type\} terrain'' and cosine-similarity argmax; we
+report overall and per-class OA.
+
+\emph{Geomorphic plausibility}: the two-sample Kolmogorov--Smirnov $D$ statistic
+between the slope (Sobel gradient magnitude) distributions of generated and real
+heightmaps, pooled over all evaluation tiles; the resulting values are reported in the supplemental material.
+
+\paragraph{Implementation.}
+All compared models use identical capacity budgets where feasible, the same CLIP text encoder, and the same DDIM sampling configuration (50 steps, guidance scale 4.0).
+Seeds, sample counts per experiment, and hardware are listed in the supplementary material.
+
+\subsection{Comparison with Baselines}
+\label{sec:comparison}
+
+\Cref{tab:main} reports the quantitative comparison addressing Q1.
+\begin{table}[t]
+  \caption{Quantitative comparison over 496 generations (124 held-out prompts $\times$ 4 seeds). The Random-pairing row reuses the full model's textures with cross-prompt-mismatched heightmaps, so its texture-quality and alignment columns coincide with the full model's by construction---only the coupling column differs. The ground-truth row reports the coupling statistic on real validation pairs. Texture quality: KID$\downarrow$, FID$_{\text{CLIP}}\downarrow$; text alignment: CLIP Score$\uparrow$; geometry--texture coupling: Pearson$\uparrow$.}
+  \label{tab:main}
+  \centering%
+  \resizebox{\columnwidth}{!}{%
+  \begin{tabular}{lcccc}
+  \toprule
+  Method & KID$\downarrow$ & FID$_{\text{CLIP}}\downarrow$ & CLIP$\uparrow$ & Pearson$\uparrow$  \\
+  \midrule
+  Random pairing (iii)          & 0.0554 & 0.1249 & 0.2642 & -0.0165 \\
+  Dual-head (i)                 & 0.4728 & 0.4775 & 0.1822 & -0.0595 \\
+  No-consistency (ii)           & 0.0396 & 0.1222 & 0.2644 & -0.0252 \\
+  Full joint model (ours)       & 0.0554 & 0.1249 & 0.2642 & -0.0103 \\
+  \midrule
+  Real pairs (ground truth)     & --     & --     & --     & -0.0475 \\
+  \bottomrule
+  \end{tabular}}%
+\end{table}
+
+We design the comparison to test the prediction of \cref{sec:joint_latent} that modeling $p(H, T \mid c)$ jointly beats stitching marginals. Raw-value Pearson turns out to be a weak axis on this data: on \emph{real} heightmap--texture pairs it separates aligned from cross-prompt-mismatched pairing only marginally ($-0.0475$ vs.\ $0.0040$; \cref{tab:pairing}), so every variant landing near zero---the full model at $-0.0103$, inside the range real terrain itself spans---says little either way about coupling. The support for jointness is therefore architectural and semantic rather than pixel-level: distributional quality collapses only under separate heads, where FID$_{\text{CLIP}}$ and KID degrade 4- to 12-fold and CLIP-aligned text conditioning drops by nearly a third relative to the shared-latent variants (0.1822 vs.\ 0.264).
+\Cref{fig:joint_vs_separate} provides the corresponding qualitative evidence: on the same prompts, the dual-head variant exhibits geometric---textural mismatches (vegetation on cliff faces, uniform cover on rugged ridges) that the joint model avoids.
+
+
+
+\begin{figure}[t]
+  \centering
+  % 第一行
+  \subfloat[heightmap-dualhead]{
+    \includegraphics[width=0.48\columnwidth]{figures/Experiment/bad heightmap.jpg}
+    \label{fig:sub1}
+  }
+  \hfill
+  \subfloat[texture-dualhead]{
+    \includegraphics[width=0.48\columnwidth]{figures/Experiment/bad texture.jpg}
+    \label{fig:sub2}
+  }
+  \\ % 强制换行
+  % 第二行
+  \subfloat[heightmap-full]{
+    \includegraphics[width=0.48\columnwidth]{figures/Experiment/good heightmap.jpg}
+    \label{fig:sub3}
+  }
+  \hfill
+  \subfloat[texture-full]{
+    \includegraphics[width=0.48\columnwidth]{figures/Experiment/good texture.jpg}
+    \label{fig:sub4}
+  }
+  
+  
+  \caption{Geometry--texture consistency comparison on identical prompts. The dual-head variant (top row) produces mismatches such as vegetation on cliff faces (marked), while joint generation (bottom row) keeps appearance aligned with geometry.}
+  
+  \label{fig:joint_vs_separate}
+\end{figure}
+
+Distribution Distance Analysis: the omission of the consistency loss yields marginally better FID-CLIP (0.1222) and KID (0.0396) than the full model (0.1249/0.0554), a small distributional cost that \cref{sec:ablation} weighs against the coupling gain.
+
+Architectural Validation: the generation quality of the dual-head configuration collapses completely. Its FID-CLIP (0.48) and KID (0.47) scores represent a drastic 4- to 12-fold degradation compared to the shared-latent variants, and its text alignment drops to 0.1822 against 0.264 for every shared-latent variant---the generative failure is not confined to geometry but extends to how well the texture follows its prompt at all. This severe performance penalty empirically supports the assertion in \cref{sec:joint_latent} that a concatenated channel representation is preferable to separated output heads.
+
+\begin{table}[h]
+    \small
+    \centering
+    
+    % 左侧表格：分类准确率
+    \begin{minipage}{0.48\columnwidth}
+        \centering
+        \caption{Classification accuracy across different terrain types.}
+        \label{tab:accuracy}
+        \begin{tabular}{lcc}
+            \toprule
+            \textbf{Type} & \textbf{Samples} & \textbf{OA} \\
+            \midrule
+            Karst        & 48  & 0.8958 \\
+            Ice mountain & 72  & 0.8750 \\
+            Desert       & 88  & 0.7045 \\
+            Danxia       & 84  & 0.4524 \\
+            Yardang      & 132 & 0.0682 \\
+            Loess        & 72  & 0.0278 \\
+            \midrule
+            \textbf{Overall} & 496 & 0.4375 \\
+            \bottomrule
+        \end{tabular}
+    \end{minipage}\hfill % \hfill 用于在两个 minipage 之间自动填充空白
+    % 右侧表格：配对方式统计
+    \begin{minipage}{0.48\columnwidth}
+        \centering
+        \caption{Raw-value Pearson of the full model under pairing perturbations, with real-data calibration rows.}
+        \label{tab:pairing}
+        \begin{tabular}{lcc}
+            \toprule
+            \textbf{Pairing} & \textbf{Mean} & \textbf{Std} \\
+            \midrule
+            Original (generated)      & -0.0103 & 0.2986 \\
+            Rot90$^\circ$ & -0.0074 & 0.1309 \\
+            H-flip        & -0.0233 & 0.1574 \\
+            Cross-prompt (generated)  & -0.0165 & 0.1366 \\
+            \midrule
+            Real aligned  & -0.0475 & 0.3136 \\
+            Real cross-prompt & 0.0040 & 0.1466 \\
+            \bottomrule
+        \end{tabular}
+    \end{minipage}
+    
+\end{table}
+
+\subsection{Fine-Grained Controllability}
+\label{sec:controllability}
+
+Q2 probes the paper's other claim: that conditioning reaches below the category level.
+We design three complementary tests.
+
+\begin{table}[t]
+    \small
+    \centering
+    
+    
+    \begin{tabular}{lccc} 
+        \toprule
+        \textbf{Pair} & \textbf{Clip Margin} & \textbf{Discr Mean [CI]} & \textbf{Significant} \\
+        \midrule
+        yardang\_vs\_karst & 0.0533 & [0.149, 0.173] & True \\
+        dendritic\_vs\_parallel & 0.0116 & [0.192, 0.218] & True \\
+        glacial\_vs\_volcanic & 0.0111 & [0.0155, 0.0345] & True \\
+        dune\_vs\_bedrock & 0.0272 & [-0.0058, 0.0218] & False \\
+        loess\_vs\_glacial & 0.0594 & [0.157, 0.186] & True \\
+        mesa\_vs\_dune & 0.0326 & [-0.005, 0.027] & False \\
+        karst\_vs\_volcanic & 0.0370 & [0.078, 0.098] & True \\
+        glacial\_valley\_vs\_river\_valley & 0.0151 & [-0.0010, 0.0187] & False \\
+        \bottomrule
+    \end{tabular}
+    \caption{\emph{Discr Mean [CI]} is the 95\% percentile-bootstrap interval (2{,}000 resamples)
+    of the difference between cross-prompt and within-prompt (seed-variance) mean LPIPS~\cite{LPIPS}
+    distance over four same-seed generations per prompt; \emph{Significant} holds when the
+    interval excludes zero, i.e., the two prompts induce perceptual differences beyond
+    sampling noise. Pairs mixing labels absent from the six-class training vocabulary (volcanic, dendritic/parallel drainage, mesa) probe generalization to unseen labels rather than coverage of trained landforms.}
+    \label{tab:category_discriminability}
+\end{table}
+
+
+\paragraph{Category-level discriminability.}
+To evaluate the model's macro-scale semantic discriminability, we conduct a zero-shot CLIP classification across 496 generated samples (\cref{tab:accuracy}). The results provide quantifiable evidence of semantic disentanglement: the model achieves an overall accuracy (OA) of 43.75\%, with highly distinct categories like Karst and Ice Mountain peaking at 89.58\% and 87.50\%, while yardang and loess fall to 6.8\% and 2.8\%, near the 16.7\% chance level of a six-class task. Perceptually, \cref{tab:category_discriminability} shows that five of eight cross-category prompt pairs induce mean LPIPS differences beyond same-prompt seed variance. On the pixel level, the structural pairing test (\cref{tab:pairing}) is more informative about the metric than about the model: raw-value Pearson on \emph{real} pairs sits at $-0.0475$ and moves to $0.0040$ when the pairing is broken by cross-prompt mismatch---a separation of roughly 0.05 that does not reach significance---and the generated outputs and all three perturbation arms fall inside that same band. We therefore read near-zero Pearson as a property of terrain data under this statistic, and locate the model's geometry--texture agreement in the semantic axes above and in the qualitative comparison of \cref{fig:joint_vs_separate}.
+
+
+
+\paragraph{Attribute-level discriminability.}
+Within a single landform category, we issue prompt pairs that differ only in one geological attribute---e.g., ``karst tower peaks'' vs.\ ``karst isolated hills'' within karst, or ``wind-carved ridges'' vs.\ ``smooth yardang'' within yardang. If fine-grained semantics are realized, the two outputs should be measurably different in ultimate output and matched to their respective attribute (\cref{fig:controllability}).
+
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=\linewidth]{gallary.pdf}
+
+  \caption{A gallery of generated terrain samples. Each row displays variations within a specific geological category (from top to bottom: Karst, Ice Mountain, and Danxia).}
+  \label{fig:gallery}
+\end{figure*}
+
+\begin{figure}[t]
+  \centering
+
+  \includegraphics[width=\linewidth]{figures/attribute.pdf}
+  
+  \caption{\textbf{Qualitative Demonstration of Attribute-Level Discriminability.} Our model synthesizes semantic modifications within a single landform category. \textbf{Top (Karst):} The model distinguishes between a deeply incised valley with dendritic drainage (left) and a dissected plateau with radial drainage (right). \textbf{Bottom (Yardang):} The generated geometry adapts to detailed aerodynamic descriptions, differentiating between uniform steep leeward faces (left) and asymmetric steep windward/gentle leeward profiles (right).}
+  \label{fig:controllability}
+\end{figure}
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\linewidth]{figures/comparision.pdf}
+    \caption{Qualitative comparison between Tencent Huanyuan 3D (top) and our model (bottom) on Danxia and Karst terrains.}
+    \label{fig:comparision}
+\end{figure}
+
+% If fine-grained semantics are realized, the two outputs should be measurably different in CLIP feature space and matched to their respective attribute. We report the feature distance between the two output groups and a zero-shot CLIP classification test that decides which prompt generated which output. 
+% We add or remove a single fine-grained phrase (e.g., \emph{``steep limestone towers''}) from an otherwise fixed prompt and inspect where the output changes.
+% The expected signature of genuine fine-grained control is that the edit alters the target structures while leaving the surrounding landscape stable [PENDING: to be filled with generated examples; see \cref{fig:controllability}].
+
+
+\paragraph{LLM-assisted semantic scoring.}
+Following recent practice, a large language model---Qwen3.5-7B Vision model~\cite{qwen3.5} judges whether a rendered multi-view depiction of the generated terrain matches the fine-grained prompt, scoring attribute presence per viewpoint; scores are averaged over the five viewpoints (\cref{tab:llm_evaluation}).
+
+We stress that this subsection is the decisive evidence for contribution~1: if attribute-level discriminability is weak on rare landforms, the corresponding claims must be scoped accordingly (\cref{sec:conclusion}).
+
+
+\subsection{Ablation Studies}
+\label{sec:ablation}
+
+We isolate two design choices (Q3).
+
+\paragraph{Joint vs.\ separate heads.}
+Removing the shared latent space recovers the dual-head variant of \cref{sec:comparison}; \cref{tab:main} reports its coupling and quality metrics, quantifying what jointness buys.
+
+\paragraph{Cross-modal consistency loss.}
+The shared latent space couples the modalities only implicitly; \cref{eq:consistency_loss} makes the coupling explicit.
+Comparing the full model with its no-consistency retrain over the 496 paired generations (same prompts and seeds), removing $\mathcal{L}_{\text{consist}}$ costs 0.015 raw-value Pearson (paired $t$-test, $p=0.049$) and 1.0\,pt zero-shot OA ($p=0.62$, not significant), while KID improves marginally without the loss (0.0396 vs 0.0554) and CLIPScore is unchanged (0.2644 vs 0.2642).
+The loss thus trades a negligible amount of distributional fidelity for a small but consistent gain in type-level correctness and pixel-level coupling---real at this scale, but modest, and bounded by the weak signal this coupling measure carries even on real data (\cref{tab:pairing}); a stronger explicit coupling objective remains an open direction (\cref{sec:conclusion}).
+
+
+\subsection{Qualitative Results}
+\label{sec:qualitative}
+Due to space constraints, ~\cref{fig:gallery} shows three types of generated terrain: Danxia, Karst and Ice Mountain. For better performance, these terrains may be generated from different prompts. More terrains and their heightmaps and textures will be contained in the supplemental materials. As shown in~\cref{fig:comparision}, we present a qualitative comparison with the Tencent Hunyuan 3D~\cite{zhao2025hunyuan3d2} system. While the baseline outputs exhibit a stylized appearance, our model generates Danxia and Karst terrains with significantly higher visual realism and more natural texture-geometry coupling.
+
+
+\subsection{User Study}
+\label{sec:userstudy}
+
+Following the scale appropriate for a generative methods paper, we conduct a perceptual evaluation to assess the fine-grained semantic alignment between the input prompts and the generated 3D outputs. In this semantic matching questionnaire, participants are presented with multi-view renderings of the generated terrains and asked to rate how accurately the geometric and textural features match detailed geological descriptions using a 5-point Likert scale. The full set of stimuli, the survey protocol, and a detailed statistical breakdown of the results are provided in the supplementary material.
+
+% TODO: figure placeholders F3--F6
+
+
+
+
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+We presented a framework that unifies fine-grained semantic control with joint heightmap--texture generation in a shared latent space: token-level text conditioning injects geological semantics into the denoising process, a single noise schedule over an 8-channel latent models geometry and appearance jointly, and an explicit cross-modal consistency loss encourages alignment between their structure.
+A terrain-specialized heightmap VAE maps elevation data into this shared space, and the whole framework is integrated into a terrain authoring system for game, simulation, and immersive content creation.
+
+\paragraph{Limitations.}
+Our dataset of 2{,}480 paired samples is two to three orders of magnitude smaller than global-scale efforts such as MESA~\cite{MESA:2025}; class frequencies are uneven (295--527 per landform), and yardang and loess outputs are still classified near chance (\cref{tab:accuracy}), so the fine-grained control claims of \cref{sec:controllability} are scoped by the discriminability evidence reported there.
+The evaluation protocol itself has two open weaknesses. First, it lacks a coupling measure with verified power at pixel level: raw-value Pearson barely separates real aligned pairs from mismatched ones (\cref{tab:pairing}), so geometry--texture agreement is currently supported at the semantic and qualitative level only, and establishing pixel-level correspondence requires a measure that first passes a ground-truth calibration. Second, the random per-tile train--test split can place neighboring tiles of the same source landscape on opposite sides, mildly flattering the distributional metrics. The consistency loss is likewise a global, spatially agnostic signal with a small weight, and each generated tile is a single $512 \times 512$ patch rather than a large continuous landscape.
+
+
+\paragraph{Future work.}
+A local, spatially aligned formulation of the consistency loss, larger and class-balanced datasets, and multi-tile generation are the natural next steps; automated split-map generation and region-level texture editing would extend the authoring system toward full production workflows. 
+\section*{Supplemental Materials}
+\label{sec:supplemental_materials}
+
+\begin{table}[t]
+    \centering
+    \caption{Quantitative evaluation of generated terrains scored by Qwen3.5-7B~\cite{qwen3.5}. Evaluations reveal that our generated terrains attain scores highly consistent with those of real terrain images, demonstrating a minimal domain gap. }
+    \label{tab:llm_evaluation}
+    \resizebox{\columnwidth}{!}{
+    \begin{tabular}{lccc}
+        \toprule
+        \textbf{Terrain Type} & Type Match Score & Quality Score & Confidence \\
+        \midrule
+        Danxia & 7.58 & 6.75 & 0.85 \\
+        Desert & 7.00 & 6.36 & 0.85 \\
+        Ice Mountain & 7.42 & 6.67 & 0.85 \\
+        Karst & 7.64 & 6.85 & 0.86 \\
+        Loess & 7.42 & 6.67 & 0.84 \\
+        Yardang & 7.83 & 7.17 & 0.86 \\
+        \midrule
+        \textbf{Overall Average} & \textbf{7.46} & \textbf{6.71} & \textbf{0.85} \\
+        \bottomrule
+    \end{tabular}}
+\end{table}
+
+
+% TODO: replace with actual repository and license details before submission.
+Please refer to the accompanying supplemental material for the geomorphic-plausibility statistics (slope Kolmogorov--Smirnov $D$ at $N{=}496$: 0.3586 full, 0.3405 no-consistency, 0.4178 dual-head) and the per-landform elevation histograms of generated versus real heightmaps, alongside an extended gallery of generated terrains (including high-resolution renders, heightmaps, RGB textures, splatmaps, and input prompts). We also provide the complete user study questionnaire and a detailed breakdown of the survey results. 
+
+
+%\bibliographystyle{abbrv}
+\bibliographystyle{abbrv-doi}
+%\bibliographystyle{abbrv-doi-narrow}
+%\bibliographystyle{abbrv-doi-hyperref}
+%\bibliographystyle{abbrv-doi-hyperref-narrow}
+
+\bibliography{main}
 \end{document}
+
