@@ -2,7 +2,7 @@ from pathlib import Path
 from PIL import Image
 import os
 
-INPUT = r'D:\Temp\Photos for Essay\DanXia\Image Sequence_138_15h28m.png'
+INPUT = r'D:\Temp\Photos for Essay\supplemental'
 OUTPUT = r'D:\Temp\Photos for Essay\Yardang\Image Sequence_169_21h52m.png'
 
 def add_white_background(input_path, output_path):
@@ -28,7 +28,7 @@ def add_white_background(input_path, output_path):
             img = img.convert('RGB')
             
         # 直接保存为原尺寸的 PNG 格式，不进行任何画质压缩
-        img.save(input_path, "PNG")
+        img.save(input.resolve(), "PNG")
         print(f"处理完成！白底已生成，原始尺寸保持为: {img.size}")
 
 # 使用示例
