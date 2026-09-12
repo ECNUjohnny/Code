@@ -67,3 +67,5 @@ resources/
 **/*.png
 **/*.jpg
 **/*.zip
+**/*.xml
+data/
