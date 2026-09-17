@@ -1,16 +1,17 @@
 \documentclass[a4paper]{article}
-    \usepackage{fullpage}
-    \usepackage{amsmath}
-    \usepackage{amssymb}
-    \usepackage{textcomp}
-    \usepackage[utf8]{inputenc}
-    \usepackage[T1]{fontenc}
-    \textheight=10in
-    \pagestyle{empty}
-    \raggedright
-    \usepackage[left=0.8in,right=0.8in,bottom=0.8in,top=0.8in]{geometry}
+% \usepackage{ctex} % Commented out as ctex is for Chinese support. Uncomment if Chinese characters are still needed.
+\usepackage{fullpage}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{textcomp}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\textheight=10in
+\pagestyle{empty}
+\raggedright
+\usepackage[left=0.8in,right=0.8in,bottom=0.8in,top=0.8in]{geometry}
 
-    %\renewcommand{\encodingdefault}{cg}
+%\renewcommand{\encodingdefault}{cg}
 %\renewcommand{\rmdefault}{lgrcmr}
 
 \def\bull{\vrule height 0.8ex width .7ex depth -.1ex }
@@ -65,67 +66,80 @@
 }
 % END RESUME DEFINITIONS %%%%%%%%%%%%%%%%%%%%%%%
 
-    \begin{document}
+\begin{document}
 \vspace*{-40pt}
-
-    
 
 %==== Profile ====%
 \vspace*{-10pt}
 \begin{center}
-	{\Huge \scshape {Zhou Junyan}}\\
-	East China Normal University, Shang Hai, China $\cdot$ Acmejohnnylynd@gmail.com $\cdot$ (+86) 18900670760 $\cdot$ ECNUjohnny.github.io\\
+	{\Huge \scshape {Junyan Zhou}}\\
+	East China Normal University, Shanghai, China $\cdot$ a936493853@outlook.com $\cdot$ (+86) 18900670760 $\cdot$ ECNUjohnny.github.io\\
 \end{center}
 
 %==== Education ====%
-\header{Beachlor's Degree}
+\header{Education}
 \textbf{East China Normal University}\hfill Shanghai, China\\
-BS Computer Science \textit{GPA: 3.82 (Currently)} \hfill Sept 2024 - June 2028 (Expected)\\
-\vspace{5mm}
-
-
+B.S. in Computer Science \textit{GPA: 3.82 (Current)} \hfill Sep 2024 - Jun 2028 (Expected)\\
+\vspace{3mm}
 
 \header{Skills}
 \begin{tabular}{ l l }
-	Programming Languages:                  & C++, Python, html, Hlsl, JavaScript, Unity Shader Language \\
-	Development Tools:                    & Git, Latex, React, Vite, PyTorch                 \\
-	Game Engines \& Graphics: & Opengl, Unity                                  \\
+	Programming Languages: & C++, Python, HTML, HLSL, JavaScript, Unity Shader Language \\
+	Development Tools: & Git, LaTeX, PyTorch \\
+	Game Engines \& 3D Software: & OpenGL, Unity, Blender \\
+    Front-end Development: & React, npm, JSX, HTML5, jQuery \\
 \end{tabular}
-\vspace{5mm}
+\vspace{3mm}
+
+\header{Profile}
+Junior student majoring in Computer Science and Technology at East China Normal University. Experienced with 3D software and APIs such as Blender and Unity, with a solid grasp of deep learning and computer graphics. For personal projects, please visit my GitHub profile: https://github.com/ECNUjohnny \\
+\vspace*{3mm}
 
 \header{Projects}
+{\textbf{Personal Game Project}} {\sl Unity, Blender, CSharp} \\
+A personal 3D game project inspired by Red Dead Redemption 2. Currently features a basic building biome and an NPC system. \\ 
+GitHub: https://github.com/ECNUjohnny/Game-Project \\
+\vspace*{3mm}
+
 {\textbf{Text-to-Fluid: Semantic Authoring of Fluid Simulation via Large Language Models}} {\sl Unity, Unity Shader Language, C++} \\
-This project aims to analyze the emotions contained in the input of users via the help of Large Language Model, and 
-accordingly change the style of a unity-rendered sph fluid to represent this emotion
-Implemented a cartoon-style SPH fluid renderer in Unity. Integrated LLMs to dynamically map rendering
-functions and parameters based on natural language text inputs from users.\\
-\vspace*{5mm}
+This project aims to utilize large language models to analyze user's emotional input and dynamically adjust the stylized SPH fluid in Unity to visualize the emotion.\\ Implemented a toon-shaded SPH fluid renderer in Unity and integrated an LLM to dynamically map rendering functions and parameters based on the user's natural language input.\\
+\vspace*{3mm}
 
-{\textbf{Stylized Terrain Generation from Text Descriptions}} {\sl Python, PyTorch, CDSE API} \\
-Developed a Deep Learning framework using Variational Autoencoders (VAEs) to generate stylized height
-maps. Integrated the Copernicus Data Space Ecosystem (CDSE) API for automated global terrain data
-acquisition and processing.\\
-\vspace*{5mm}
+{\textbf{Text-Driven Stylized Terrain Generation}} {\sl Python, PyTorch, CDSE API} \\
+Developed a deep learning framework based on Variational Autoencoders (VAE) to generate stylized heightmaps. Integrated the Copernicus Data Space Ecosystem (CDSE) API for automated acquisition and processing of global terrain data.\\
+GitHub: https://github.com/ECNUjohnny/llm-style-terrain-joint \\
+\vspace*{3mm}
 
-\header{Publications}
-{\textbf{Text-to-Fluid: Semantic Authoring of Fluid Simulation via Large Language Models}} {\sl International Conference on Computer-Aided Design and Computer Graphics} \\
+{\textbf{Medical Institution Data Visualization}} {\sl React, JavaScript, JSX} \\
+Course project for Data Visualization. Developed a web application using the React framework to visualize the distribution of medical institutions and provide additional features such as heatmaps, administrative district statistical histograms, and shortest path search. \\
+GitHub: https://github.com/ECNUjohnny/hospital-dataviz
+\vspace*{3mm}
+
+\header{Research Experience}
+{\textbf{Text-to-Fluid: Semantic Authoring of Fluid Simulation via Large Language Models}} {\sl International Conference on Computer-Aided Design and Computer Graphics (CAD/Graphics)} \\
 Xubin Du, Juanjie Luo, Changbo Wang, Chenhui Li, Junyan Zhou, Nan Xiang
-\vspace*{5mm}
+\vspace*{3mm}
 
+{\textbf{Text-Driven Joint Generation of Terrain Geometry and Texture in a Shared Latent Space}} {\sl IEEE VR (Under Review)} \\
+Junyan Zhou, Yunze Han, Haizhou Zhu, Chenhui Li
+\vspace*{3mm}
 
-\header{Awards}
-\textbf{Lanqiao Cup National Software and IT Talent Competition} \hfill MIIT, China\\
-First Prize in Shanghai Provincial Level \hfill April, 2026\\
-\vspace*{5mm}
+\header{Honors \& Awards}
+\textbf{Lanqiao Cup National Software and Information Technology Professionals Competition} \hfill Ministry of Industry and Information Technology\\
+First Prize, Shanghai Provincial \hfill Apr 2026\\
+\vspace*{3mm}
 
-\textbf{Lanqiao Cup National Software and IT Talent Competiton} \hfill MIIT, China\\
-Third Prize in National Final Level \hfill June, 2026\\
-\vspace*{5mm}
+\textbf{Lanqiao Cup National Software and Information Technology Professionals Competition} \hfill Ministry of Industry and Information Technology\\
+Third Prize, National Final \hfill Jun 2026\\
+\vspace*{3mm}
 
-\textbf{The Chinese Mathematics Competitions for College Students} \hfill Mathematical Society of China\\
-First Prize in Shang Hai area \hfill December, 2025\\
-\vspace*{5mm}
+\textbf{Chinese Mathematics Competitions (CMC)} \hfill Chinese Mathematical Society\\
+First Prize, Shanghai Provincial \hfill Dec 2025\\
+\vspace*{3mm}
 
+\textbf{IELTS Academic} \hfill IELTS British Council\\
+Overall Band Score: 7.5 (Reading: 9.0, Listening: 8.5, Speaking: 6.5, Writing: 6.5) \hfill Jul 2026
+\vspace*{3mm}
 
 \ 
 \end{document}

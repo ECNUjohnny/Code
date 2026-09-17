@@ -1,0 +1,303 @@
+
+
+
+{
+    "pk": 171154,
+    "url": "https://www.blenderkit.com/api/v1/assets/afa37a2b-8685-4e57-a226-8267ca69556e/",
+    "id": "afa37a2b-8685-4e57-a226-8267ca69556e",
+    "assetBaseId": "04814bf0-843e-44c0-841f-e75e2ddfcb83",
+    "versionNumber": 1,
+    "author": {
+        "id": 275024,
+        "firstName": "Free",
+        "lastName": "poly",
+        "gravatarHash": "da874f7c7434437d3f907d4412248629",
+        "avatar128": "/avatar-redirect/446f1263-ce66-4fc6-989e-027c10b660ae/128/",
+        "avatar256": "/avatar-redirect/446f1263-ce66-4fc6-989e-027c10b660ae/256/",
+        "avatar512": "/avatar-redirect/446f1263-ce66-4fc6-989e-027c10b660ae/512/",
+        "aboutMe": "I'm River Yang, the guy behind FreePoly.org.\r\nAs you probably know, I create high quality 3D assets.\r\nI want to lower the barrier of entry for new artists, remove financial barriers, and make it easier for experienced artists to focus on creativity",
+        "aboutMeUrl": "https://www.artstation.com/riveryang",
+        "fullName": "Free poly",
+        "socialNetworks": [
+            {
+                "socialNetwork": {
+                    "name": "YouTube",
+                    "icon": "<i class=\"fab fa-youtube\" title=\"YouTube\"></i><span class=\"sr-only\">YouTube</span>",
+                    "order": 1
+                },
+                "url": "https://www.youtube.com/channel/UCcEmLsfG32U5RwnANrztm0Q"
+            },
+            {
+                "socialNetwork": {
+                    "name": "ArtStation",
+                    "icon": "<i class=\"fab fa-artstation\" title=\"ArtStation\"></i><span class=\"sr-only\">ArtStation</span>",
+                    "order": 5
+                },
+                "url": "https://www.artstation.com/riveryang"
+            },
+            {
+                "socialNetwork": {
+                    "name": "Twitter",
+                    "icon": "<i class=\"fab fa-x-twitter\" title=\"Twitter\"></i><span class=\"sr-only\">Twitter</span>",
+                    "order": 7
+                },
+                "url": "https://twitter.com/After07016046"
+            }
+        ]
+    },
+    "name": "Scan old building scene",
+    "displayName": "Scan old building scene",
+    "description": "scan model,use 4k texture,And equipped with a path animation\r\n\r\nCycle Render",
+    "descriptionHtml": "<p>scan model,use 4k texture,And equipped with a path animation</p>\n<p>Cycle Render</p>",
+    "assetType": "scene",
+    "category": "abstract",
+    "isFree": false,
+    "isForSale": false,
+    "basePrice": null,
+    "tags": [
+        "Scan",
+        "old",
+        "building",
+        "scene",
+        "broken"
+    ],
+    "license": "cc_zero",
+    "sourceAppName": "blender",
+    "sourceAppVersion": "4.4.3",
+    "addonVersion": "3.16.1",
+    "created": "2025-08-24T11:30:18.179204+02:00",
+    "lastUserInteraction": "2025-08-24T11:39:37.549718+02:00",
+    "verificationStatus": "validated",
+    "isPrivate": false,
+    "files": [
+        {
+            "fileType": "blend",
+            "id": 793020,
+            "downloadUrl": "https://www.blenderkit.com/api/v1/downloads/793020/",
+            "uuid": null,
+            "created": "2025-08-24T11:39:36.985525+02:00",
+            "isThumbnail": false,
+            "modified": "2025-08-24T11:39:36.985539+02:00",
+            "mimeType": null,
+            "resolution": null,
+            "fileUploadSize": 3099804454,
+            "isFeatured": false,
+            "filename": "assets/afa37a2b86854e57a2268267ca69556e/files/blend_3924bec2-f919-44b1-9b7b-f1467a3d0951.blend",
+            "flexFactor": null
+        },
+        {
+            "fileType": "thumbnail",
+            "id": 793017,
+            "downloadUrl": "https://www.blenderkit.com/api/v1/downloads/793017/",
+            "uuid": null,
+            "fileThumbnail": "https://public.blenderkit.com/thumbnails/assets/afa37a2b86854e57a2268267ca69556e/files/thumbnail_f91df490-d0b7-46e5-99bc-97e696e9209f.png.96x96_q85_crop-%2C.png",
+            "fileThumbnailLarge": "https://public.blenderkit.com/thumbnails/assets/afa37a2b86854e57a2268267ca69556e/files/thumbnail_f91df490-d0b7-46e5-99bc-97e696e9209f.png.1024x1024_q85_crop-%2C.png",
+            "created": "2025-08-24T11:30:25.679803+02:00",
+            "isThumbnail": true,
+            "modified": "2025-12-23T04:37:55.735778+01:00",
+            "mimeType": null,
+            "resolution": null,
+            "fileUploadSize": 4928557,
+            "width": 2500,
+            "height": 1054,
+            "isFeatured": false,
+            "filename": "assets/afa37a2b86854e57a2268267ca69556e/files/thumbnail_f91df490-d0b7-46e5-99bc-97e696e9209f.png",
+            "thumbnailSmallUrl": "https://public.blenderkit.com/thumbnails/assets/afa37a2b86854e57a2268267ca69556e/files/thumbnail_f91df490-d0b7-46e5-99bc-97e696e9209f.png.256x256_q85_crop-%2C.png",
+            "thumbnailMiddleUrl": "https://public.blenderkit.com/thumbnails/assets/afa37a2b86854e57a2268267ca69556e/files/thumbnail_f91df490-d0b7-46e5-99bc-97e696e9209f.png.512x512_q85_crop-%2C.png",
+            "thumbnailLargeUrl": "https://public.blenderkit.com/thumbnails/assets/afa37a2b86854e57a2268267ca69556e/files/thumbnail_f91df490-d0b7-46e5-99bc-97e696e9209f.png.1024x1024_q85_crop-%2C.png",
+            "thumbnailXlargeUrl": "https://public.blenderkit.com/thumbnails/assets/afa37a2b86854e57a2268267ca69556e/files/thumbnail_f91df490-d0b7-46e5-99bc-97e696e9209f.png.2048x2048_q85_crop-%2C.png",
+            "thumbnailSmallUrlNonsquared": "https://public.blenderkit.com/thumbnails/assets/afa37a2b86854e57a2268267ca69556e/files/thumbnail_f91df490-d0b7-46e5-99bc-97e696e9209f.png.256x256_q85.png",
+            "thumbnailMiddleUrlNonsquared": "https://public.blenderkit.com/thumbnails/assets/afa37a2b86854e57a2268267ca69556e/files/thumbnail_f91df490-d0b7-46e5-99bc-97e696e9209f.png.512x512_q85.png",
+            "thumbnailLargeUrlNonsquared": "https://public.blenderkit.com/thumbnails/assets/afa37a2b86854e57a2268267ca69556e/files/thumbnail_f91df490-d0b7-46e5-99bc-97e696e9209f.png.1024x1024_q85.png",
+            "thumbnailXlargeUrlNonsquared": "https://public.blenderkit.com/thumbnails/assets/afa37a2b86854e57a2268267ca69556e/files/thumbnail_f91df490-d0b7-46e5-99bc-97e696e9209f.png.2048x2048_q85.png",
+            "thumbnailSmallUrlWebp": "https://public.blenderkit.com/thumbnails/assets/afa37a2b86854e57a2268267ca69556e/files/thumbnail_f91df490-d0b7-46e5-99bc-97e696e9209f.png.256x256_q85_crop-%2C.png.webp?webp_generated=1766680491",
+            "thumbnailMiddleUrlWebp": "https://public.blenderkit.com/thumbnails/assets/afa37a2b86854e57a2268267ca69556e/files/thumbnail_f91df490-d0b7-46e5-99bc-97e696e9209f.png.512x512_q85_crop-%2C.png.webp?webp_generated=1766680491",
+            "thumbnailLargeUrlWebp": "https://public.blenderkit.com/thumbnails/assets/afa37a2b86854e57a2268267ca69556e/files/thumbnail_f91df490-d0b7-46e5-99bc-97e696e9209f.png.1024x1024_q85_crop-%2C.png.webp?webp_generated=1766680491",
+            "thumbnailXlargeUrlWebp": "https://public.blenderkit.com/thumbnails/assets/afa37a2b86854e57a2268267ca69556e/files/thumbnail_f91df490-d0b7-46e5-99bc-97e696e9209f.png.2048x2048_q85_crop-%2C.png.webp?webp_generated=1766680491",
+            "thumbnailSmallUrlNonsquaredWebp": "https://public.blenderkit.com/thumbnails/assets/afa37a2b86854e57a2268267ca69556e/files/thumbnail_f91df490-d0b7-46e5-99bc-97e696e9209f.png.256x256_q85.png.webp?webp_generated=1766680491",
+            "thumbnailMiddleUrlNonsquaredWebp": "https://public.blenderkit.com/thumbnails/assets/afa37a2b86854e57a2268267ca69556e/files/thumbnail_f91df490-d0b7-46e5-99bc-97e696e9209f.png.512x512_q85.png.webp?webp_generated=1766680491",
+            "thumbnailLargeUrlNonsquaredWebp": "https://public.blenderkit.com/thumbnails/assets/afa37a2b86854e57a2268267ca69556e/files/thumbnail_f91df490-d0b7-46e5-99bc-97e696e9209f.png.1024x1024_q85.png.webp?webp_generated=1766680491",
+            "thumbnailXlargeUrlNonsquaredWebp": "https://public.blenderkit.com/thumbnails/assets/afa37a2b86854e57a2268267ca69556e/files/thumbnail_f91df490-d0b7-46e5-99bc-97e696e9209f.png.2048x2048_q85.png.webp?webp_generated=1766680491",
+            "flexFactor": 2.3719
+        }
+    ],
+    "filesSize": 3104733011,
+    "showMarketingLabels": true,
+    "webpGeneratedTimestamp": 1766680491,
+    "score": 11700.0,
+    "ratingsMedian": {
+        "bookmarks": 1.0,
+        "workingHours": 130.0,
+        "quality": 9.0,
+        "virtualPrice": null
+    },
+    "ratingsAverage": {
+        "bookmarks": 0.9857142857142858,
+        "workingHours": 130.0,
+        "quality": 9.0,
+        "virtualPrice": null
+    },
+    "ratingsCount": {
+        "bookmarks": 70,
+        "workingHours": 2,
+        "quality": 2,
+        "virtualPrice": 0
+    },
+    "ratingsSum": {
+        "bookmarks": 69.0,
+        "workingHours": 260.0,
+        "quality": 18.0,
+        "virtualPrice": null,
+        "score": 11700.0
+    },
+    "pageBlocks": null,
+    "access": "full",
+    "accessLabel": "Full Plan",
+    "videoLink": "",
+    "dictParameters": {
+        "sexualizedContent": false,
+        "joinBlenderkitDiscounts": true,
+        "addons": true,
+        "platforms": [
+            "windows-x64",
+            "macos-arm64",
+            "linux-x64",
+            "macos-x64",
+            "windows-arm64"
+        ],
+        "faceCount": 1,
+        "productionLevel": "finished",
+        "modelStyle": "realistic",
+        "condition": "new",
+        "purePbr": true,
+        "shaders": [
+            "[]"
+        ],
+        "animated": true,
+        "uv": false,
+        "engines": [
+            "[cycles]"
+        ],
+        "modifiers": [
+            "[]"
+        ],
+        "materials": [
+            "[]"
+        ],
+        "faceCountRender": 1,
+        "objectCount": 1
+    },
+    "lastZipFileUpload": null,
+    "lastBlendUpload": "2025-08-24T09:39:36.985525+00:00",
+    "lastPrxcUpload": null,
+    "lastThumbnailUpload": "2025-08-24T09:30:25.679803+00:00",
+    "lastGltfUpload": null,
+    "lastWireThumbnailUpload": null,
+    "lastAnimatedThumbnailUpload": null,
+    "lastResolutionUpload": null,
+    "lastVideoUpload": null,
+    "lastGltfGodotUpload": null,
+    "lastPhotoThumbnailUpload": null,
+    "canDownload": true,
+    "canDownloadError": true,
+    "parameters": [
+        {
+            "parameterType": "sexualizedContent",
+            "value": false
+        },
+        {
+            "parameterType": "joinBlenderkitDiscounts",
+            "value": true
+        },
+        {
+            "parameterType": "addons",
+            "value": true
+        },
+        {
+            "parameterType": "platforms",
+            "value": [
+                "windows-x64",
+                "macos-arm64",
+                "linux-x64",
+                "macos-x64",
+                "windows-arm64"
+            ]
+        },
+        {
+            "parameterType": "faceCount",
+            "value": 1
+        },
+        {
+            "parameterType": "productionLevel",
+            "value": "finished"
+        },
+        {
+            "parameterType": "modelStyle",
+            "value": "realistic"
+        },
+        {
+            "parameterType": "condition",
+            "value": "new"
+        },
+        {
+            "parameterType": "purePbr",
+            "value": true
+        },
+        {
+            "parameterType": "shaders",
+            "value": [
+                "[]"
+            ]
+        },
+        {
+            "parameterType": "animated",
+            "value": true
+        },
+        {
+            "parameterType": "uv",
+            "value": false
+        },
+        {
+            "parameterType": "engines",
+            "value": [
+                "[cycles]"
+            ]
+        },
+        {
+            "parameterType": "modifiers",
+            "value": [
+                "[]"
+            ]
+        },
+        {
+            "parameterType": "materials",
+            "value": [
+                "[]"
+            ]
+        },
+        {
+            "parameterType": "faceCountRender",
+            "value": 1
+        },
+        {
+            "parameterType": "objectCount",
+            "value": 1
+        }
+    ],
+    "thumbnailSmallUrl": "https://public.blenderkit.com/thumbnails/assets/afa37a2b86854e57a2268267ca69556e/files/thumbnail_f91df490-d0b7-46e5-99bc-97e696e9209f.png.256x256_q85_crop-%2C.png",
+    "thumbnailMiddleUrl": "https://public.blenderkit.com/thumbnails/assets/afa37a2b86854e57a2268267ca69556e/files/thumbnail_f91df490-d0b7-46e5-99bc-97e696e9209f.png.512x512_q85_crop-%2C.png",
+    "thumbnailLargeUrl": "https://public.blenderkit.com/thumbnails/assets/afa37a2b86854e57a2268267ca69556e/files/thumbnail_f91df490-d0b7-46e5-99bc-97e696e9209f.png.1024x1024_q85_crop-%2C.png",
+    "thumbnailXlargeUrl": "https://public.blenderkit.com/thumbnails/assets/afa37a2b86854e57a2268267ca69556e/files/thumbnail_f91df490-d0b7-46e5-99bc-97e696e9209f.png.2048x2048_q85_crop-%2C.png",
+    "thumbnailSmallUrlNonsquared": "https://public.blenderkit.com/thumbnails/assets/afa37a2b86854e57a2268267ca69556e/files/thumbnail_f91df490-d0b7-46e5-99bc-97e696e9209f.png.256x256_q85.png",
+    "thumbnailMiddleUrlNonsquared": "https://public.blenderkit.com/thumbnails/assets/afa37a2b86854e57a2268267ca69556e/files/thumbnail_f91df490-d0b7-46e5-99bc-97e696e9209f.png.512x512_q85.png",
+    "thumbnailLargeUrlNonsquared": "https://public.blenderkit.com/thumbnails/assets/afa37a2b86854e57a2268267ca69556e/files/thumbnail_f91df490-d0b7-46e5-99bc-97e696e9209f.png.1024x1024_q85.png",
+    "thumbnailXlargeUrlNonsquared": "https://public.blenderkit.com/thumbnails/assets/afa37a2b86854e57a2268267ca69556e/files/thumbnail_f91df490-d0b7-46e5-99bc-97e696e9209f.png.2048x2048_q85.png",
+    "thumbnailSmallUrlWebp": "https://public.blenderkit.com/thumbnails/assets/afa37a2b86854e57a2268267ca69556e/files/thumbnail_f91df490-d0b7-46e5-99bc-97e696e9209f.png.256x256_q85_crop-%2C.png.webp?webp_generated=1766680491",
+    "thumbnailMiddleUrlWebp": "https://public.blenderkit.com/thumbnails/assets/afa37a2b86854e57a2268267ca69556e/files/thumbnail_f91df490-d0b7-46e5-99bc-97e696e9209f.png.512x512_q85_crop-%2C.png.webp?webp_generated=1766680491",
+    "thumbnailLargeUrlWebp": "https://public.blenderkit.com/thumbnails/assets/afa37a2b86854e57a2268267ca69556e/files/thumbnail_f91df490-d0b7-46e5-99bc-97e696e9209f.png.1024x1024_q85_crop-%2C.png.webp?webp_generated=1766680491",
+    "thumbnailXlargeUrlWebp": "https://public.blenderkit.com/thumbnails/assets/afa37a2b86854e57a2268267ca69556e/files/thumbnail_f91df490-d0b7-46e5-99bc-97e696e9209f.png.2048x2048_q85_crop-%2C.png.webp?webp_generated=1766680491",
+    "thumbnailSmallUrlNonsquaredWebp": "https://public.blenderkit.com/thumbnails/assets/afa37a2b86854e57a2268267ca69556e/files/thumbnail_f91df490-d0b7-46e5-99bc-97e696e9209f.png.256x256_q85.png.webp?webp_generated=1766680491",
+    "thumbnailMiddleUrlNonsquaredWebp": "https://public.blenderkit.com/thumbnails/assets/afa37a2b86854e57a2268267ca69556e/files/thumbnail_f91df490-d0b7-46e5-99bc-97e696e9209f.png.512x512_q85.png.webp?webp_generated=1766680491",
+    "thumbnailLargeUrlNonsquaredWebp": "https://public.blenderkit.com/thumbnails/assets/afa37a2b86854e57a2268267ca69556e/files/thumbnail_f91df490-d0b7-46e5-99bc-97e696e9209f.png.1024x1024_q85.png.webp?webp_generated=1766680491",
+    "thumbnailXlargeUrlNonsquaredWebp": "https://public.blenderkit.com/thumbnails/assets/afa37a2b86854e57a2268267ca69556e/files/thumbnail_f91df490-d0b7-46e5-99bc-97e696e9209f.png.2048x2048_q85.png.webp?webp_generated=1766680491"
+}
