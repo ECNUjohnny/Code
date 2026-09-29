@@ -1,11 +1,18 @@
 COMPILER = nvcc
 
-CFLAGS = -Xcompiler "/utf-8"
+CFLAGS = -arch=native -Xcompiler -utf-8
 
-test01: 
-	$(COMPILER) $(CFLAGS) test01.cu -o test01
+TARGET = test01
 
-.PHONY: clean
+all: $(TARGET)
+
+$(TARGET): $(TARGET).obj  
+	$(COMPILER) $(CFLAGS) $(TARGET).obj -o $(TARGET) -L ./lib
+
+$(TARGET).obj: $(TARGET).cu
+	$(COMPILER) $(CFLAGS) -c $(TARGET).cu -o $(TARGET).obj
+
+.PHONY: all clean
 
 clean:
-	del /Q /F *.o *.exe
+	del /Q /F *.obj
