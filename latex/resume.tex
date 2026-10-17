@@ -1,11 +1,11 @@
-\documentclass[a4paper]{article}
-% \usepackage{ctex} % Commented out as ctex is for Chinese support. Uncomment if Chinese characters are still needed.
+\documentclass[a4paper, 11pt]{article}
 \usepackage{fullpage}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{textcomp}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
+\usepackage[hidelinks]{hyperref}
 \textheight=10in
 \pagestyle{empty}
 \raggedright
@@ -69,77 +69,82 @@
 \begin{document}
 \vspace*{-40pt}
 
-%==== Profile ====%
+%==== Profile ====%%
 \vspace*{-10pt}
 \begin{center}
-	{\Huge \scshape {Junyan Zhou}}\\
-	East China Normal University, Shanghai, China $\cdot$ a936493853@outlook.com $\cdot$ (+86) 18900670760 $\cdot$ ECNUjohnny.github.io\\
+    {\Huge \scshape {Junyan Zhou}}\\
+    Shanghai, China $\cdot$ \href{mailto:a936493853@outlook.com}{a936493853@outlook.com} $\cdot$ (+86) 18900670760 $\cdot$ \url{https://ECNUjohnny.github.io}\\
 \end{center}
 
-%==== Education ====%
+%==== Education ====%%
 \header{Education}
 \textbf{East China Normal University}\hfill Shanghai, China\\
-B.S. in Computer Science \textit{GPA: 3.82 (Current)} \hfill Sep 2024 - Jun 2028 (Expected)\\
+B.S. in Computer Science and Technology \textit{GPA: 3.82 (current)} \hfill Sep. 2024 -- Jun. 2028 (Expected)\\
 \vspace{3mm}
 
-\header{Skills}
+\header{Technical Skills}
 \begin{tabular}{ l l }
-	Programming Languages: & C++, Python, HTML, HLSL, JavaScript, Unity Shader Language \\
-	Development Tools: & Git, LaTeX, PyTorch \\
-	Game Engines \& 3D Software: & OpenGL, Unity, Blender \\
-    Front-end Development: & React, npm, JSX, HTML5, jQuery \\
+    Programming Languages: & C++, Python, HTML, HLSL, JavaScript, C\#, Unity ShaderLab \\
+    Development Tools: & Git, LaTeX, PyTorch \\
+    Graphics and 3D Tools: & OpenGL, Unity, Unreal Engine, Blender \\
+    Front-End Development: & React, npm, JSX, HTML5, jQuery \\
 \end{tabular}
 \vspace{3mm}
 
 \header{Profile}
-Junior student majoring in Computer Science and Technology at East China Normal University. Experienced with 3D software and APIs such as Blender and Unity, with a solid grasp of deep learning and computer graphics. For personal projects, please visit my GitHub profile: https://github.com/ECNUjohnny \\
+Computer Science and Technology undergraduate at East China Normal University, with experience using 3D tools such as Blender and Unity and knowledge of deep learning and computer graphics. More personal projects are available on my GitHub: \url{https://github.com/ECNUjohnny}.\\
 \vspace*{3mm}
 
 \header{Projects}
-{\textbf{Personal Game Project}} {\sl Unity, Blender, CSharp} \\
-A personal 3D game project inspired by Red Dead Redemption 2. Currently features a basic building biome and an NPC system. \\ 
-GitHub: https://github.com/ECNUjohnny/Game-Project \\
+{\textbf{Personal Game Project}} {\sl Unity, Blender, C\#} \\
+A 3D game developed in Unity and inspired by \textit{Red Dead Redemption 2}. The project has a relatively complete system architecture and a range of gameplay elements.\\
+GitHub: \url{https://github.com/ECNUjohnny/Game-Project}\\
 \vspace*{3mm}
 
 {\textbf{Text-to-Fluid: Semantic Authoring of Fluid Simulation via Large Language Models}} {\sl Unity, Unity Shader Language, C++} \\
-This project aims to utilize large language models to analyze user's emotional input and dynamically adjust the stylized SPH fluid in Unity to visualize the emotion.\\ Implemented a toon-shaded SPH fluid renderer in Unity and integrated an LLM to dynamically map rendering functions and parameters based on the user's natural language input.\\
+This project uses an LLM to analyze the emotions conveyed by user input and express them visually by adjusting properties (such as color) of an SPH fluid rendered in Unity. I implemented a cartoon-style SPH fluid renderer and integrated an LLM to dynamically map natural-language input to rendering functions and parameters.\\
 \vspace*{3mm}
 
 {\textbf{Text-Driven Stylized Terrain Generation}} {\sl Python, PyTorch, CDSE API} \\
-Developed a deep learning framework based on Variational Autoencoders (VAE) to generate stylized heightmaps. Integrated the Copernicus Data Space Ecosystem (CDSE) API for automated acquisition and processing of global terrain data.\\
-GitHub: https://github.com/ECNUjohnny/llm-style-terrain-joint \\
+A generative model based on a variational autoencoder (VAE) and U-Net for generating stylized height maps and corresponding color textures. Integrated the Copernicus Data Space Ecosystem (CDSE) API to automate the acquisition and processing of global terrain data.\\
+GitHub: \url{https://github.com/ECNUjohnny/llm-style-terrain-joint}\\
 \vspace*{3mm}
 
-{\textbf{Medical Institution Data Visualization}} {\sl React, JavaScript, JSX} \\
-Course project for Data Visualization. Developed a web application using the React framework to visualize the distribution of medical institutions and provide additional features such as heatmaps, administrative district statistical histograms, and shortest path search. \\
-GitHub: https://github.com/ECNUjohnny/hospital-dataviz
+{\textbf{Healthcare Facility Data Visualization}} {\sl React, JavaScript, JSX} \\
+A course project for data visualization. Built a web application using React to visualize the distribution of healthcare facilities, with features including heatmaps, histograms of administrative-district statistics, and shortest-path search.\\
+GitHub: \url{https://github.com/ECNUjohnny/hospital-dataviz}\\
+\vspace*{3mm}
+
+{\textbf{TinyRenderer}} {\sl C++} \\
+Forked the TinyRenderer repository and implemented my own version by following the author's official tutorials. The project includes low-level C++ implementations of a rasterizer, a linear algebra library, and other fundamental components.\\
+GitHub: \url{https://github.com/ECNUjohnny/tinyrenderer/tree/My-branch}\\
 \vspace*{3mm}
 
 \header{Research Experience}
 {\textbf{Text-to-Fluid: Semantic Authoring of Fluid Simulation via Large Language Models}} {\sl International Conference on Computer-Aided Design and Computer Graphics (CAD/Graphics)} \\
-Xubin Du, Juanjie Luo, Changbo Wang, Chenhui Li, Junyan Zhou, Nan Xiang
+Xubin Du, Juanjie Luo, Changbo Wang, Chenhui Li, Junyan Zhou, Nan Xiang\\
 \vspace*{3mm}
 
-{\textbf{Text-Driven Joint Generation of Terrain Geometry and Texture in a Shared Latent Space}} {\sl IEEE VR (Under Review)} \\
-Junyan Zhou, Yunze Han, Haizhou Zhu, Chenhui Li
+{\textbf{Text-Driven Joint Generation of Terrain Geometry and Texture in a Shared Latent Space}} {\sl IEEE VR (under review)} \\
+Junyan Zhou, Yunze Han, Haizhou Zhu, Chenhui Li\\
 \vspace*{3mm}
 
-\header{Honors \& Awards}
-\textbf{Lanqiao Cup National Software and Information Technology Professionals Competition} \hfill Ministry of Industry and Information Technology\\
-First Prize, Shanghai Provincial \hfill Apr 2026\\
+\header{Honors and Awards}
+\textbf{Lanqiao Cup National Software and IT Professionals Competition}\\
+Shanghai Regional First Prize \hfill April 2026\\
+\textit{Organizer: Ministry of Industry and Information Technology of China}\\
 \vspace*{3mm}
 
-\textbf{Lanqiao Cup National Software and Information Technology Professionals Competition} \hfill Ministry of Industry and Information Technology\\
-Third Prize, National Final \hfill Jun 2026\\
+\textbf{Lanqiao Cup National Software and IT Professionals Competition}\\
+National Finals Third Prize \hfill June 2026\\
+\textit{Organizer: Ministry of Industry and Information Technology of China}\\
 \vspace*{3mm}
 
-\textbf{Chinese Mathematics Competitions (CMC)} \hfill Chinese Mathematical Society\\
-First Prize, Shanghai Provincial \hfill Dec 2025\\
+\textbf{National College Student Mathematics Competition}\\
+Shanghai Regional First Prize \hfill December 2025\\
+\textit{Organizer: Chinese Mathematical Society}\\
 \vspace*{3mm}
 
-\textbf{IELTS Academic} \hfill IELTS British Council\\
-Overall Band Score: 7.5 (Reading: 9.0, Listening: 8.5, Speaking: 6.5, Writing: 6.5) \hfill Jul 2026
-\vspace*{3mm}
-
-\ 
+\textbf{IELTS Academic Test} \hfill British Council\\
+Overall Band Score: 7.5; Reading: 9.0, Listening: 8.5, Speaking: 6.5, Writing: 6.5 \hfill July 2026\\
 \end{document}
